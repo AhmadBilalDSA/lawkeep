@@ -1,0 +1,38 @@
+# Nightly deep search for your project: copy this file to .github/workflows/lawkeep-nightly.yml
+# in YOUR repository. (Files in this templates/ folder do not run in the lawkeep repository.)
+#
+# Pull-request checks use fixed examples so the same code always gets the same verdict. This
+# nightly job runs `lawkeep check --profile deep` (more inputs, a new random seed each night) to
+# find rare failures. It fails the nightly job when a law fails, so someone gets notified; it
+# never blocks a pull request. When it finds a failure, the report (uploaded below) shows the
+# simplest failing input: ask your coding agent to fix the code and save that input as an
+# example, so every later check retries it.
+name: lawkeep nightly
+
+on:
+  schedule:
+    - cron: "23 2 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deep:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - id: lawkeep
+        uses: lawkeep/lawkeep@v0 # pin a release tag once lawkeep v0.1 is published
+        with:
+          profile: deep
+          comment: "false"
+          fail-on-broken-laws: "true"
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lawkeep-nightly
+          path: |
+            ${{ steps.lawkeep.outputs.check-json }}
+            laws/failing_examples.jsonl
+          if-no-files-found: ignore

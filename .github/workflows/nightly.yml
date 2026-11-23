@@ -1,0 +1,40 @@
+# Nightly deep search for lawkeep's own example projects: many more random inputs than the
+# pull-request profile (lawkeep.toml [check.deep]), so rare failures get a chance to show up.
+name: nightly deep search
+
+on:
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deep:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        example: [billing, bookings]
+    steps:
+      - uses: actions/checkout@v4
+      - name: lawkeep check --profile deep
+        id: lawkeep
+        uses: ./
+        with:
+          working-directory: examples/${{ matrix.example }}
+          lawkeep-spec: ${{ github.workspace }}
+          install-project: "false"
+          profile: deep
+          comment: "false"
+          fail-on-broken-laws: "true"
+      - name: Keep the report and any newly saved failing examples
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lawkeep-deep-${{ matrix.example }}
+          path: |
+            ${{ steps.lawkeep.outputs.check-json }}
+            examples/${{ matrix.example }}/laws/failing_examples.jsonl
+          if-no-files-found: ignore

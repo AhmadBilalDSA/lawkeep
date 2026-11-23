@@ -1,0 +1,35 @@
+# lawkeep: run every law on pull requests and post one plain-English law change report.
+# Added by `lawkeep init`. It never blocks a merge by itself and needs no review process;
+# make it a required check in your branch settings only if your team wants that.
+# Inputs of the action: see https://github.com/lawkeep/lawkeep/blob/main/action.yml
+name: lawkeep
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "23 3 * * *" # nightly: deeper random search for failing inputs
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write # to post the law change report as a comment
+
+jobs:
+  laws:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # the protection report compares with the base branch
+# lawkeep's own repository: use the action and package from this checkout.
+      - uses: ./
+        with:
+          lawkeep-spec: "."
+          # Pull requests and pushes: fixed examples (same code, same verdict).
+          # Nightly: the "deep" profile (more inputs, a new random seed each night).
+          profile: ${{ github.event_name == 'schedule' && 'deep' || '' }}
+          # Only pull requests get the one lawkeep comment.
+          comment: ${{ github.event_name == 'pull_request' && 'true' || 'false' }}
+          fail-on-broken-laws: "false" # "true" makes failing laws fail this job

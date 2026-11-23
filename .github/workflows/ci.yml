@@ -1,0 +1,109 @@
+# CI for lawkeep itself: tests, lint, both example projects through the real gate, and the
+# lawkeep GitHub Action run against an example (a self-test of action.yml).
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: tests (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install
+        run: uv sync --all-extras
+      - name: Tests (including the cheating test suite in tests/tamper)
+        run: uv run pytest -q -rxX
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync --locked --all-extras  # --locked: fail if uv.lock is out of date
+      - run: uv run ruff check src tests
+      - run: uv run ruff format --check src tests
+      # Type check: src/lawkeep in strict mode, tests in standard mode (see [tool.pyright] in
+      # pyproject.toml). `uv run` uses the pyright version pinned in uv.lock.
+      - name: Type check (pyright)
+        run: uv run pyright
+
+  examples:
+    name: example projects through the gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync
+      - name: Both examples pass lawkeep check
+        run: |
+          set -euo pipefail
+          for ex in billing bookings; do
+            echo "::group::examples/$ex"
+            uv run lawkeep check --root "examples/$ex"
+            echo "::endgroup::"
+          done
+      - name: Each planted bug fails the gate with a small failing input
+        run: |
+          set -uo pipefail
+          for ex in billing bookings; do
+            work="$RUNNER_TEMP/$ex"
+            cp -r "examples/$ex" "$work"
+            (cd "$work" && git apply planted_bug.patch)
+            uv run lawkeep check --json --root "$work" > "$RUNNER_TEMP/$ex.json"
+            code=$?
+            uv run python - "$RUNNER_TEMP/$ex.json" "$code" <<'PY'
+          import json, sys
+          report, code = json.load(open(sys.argv[1])), int(sys.argv[2])
+          failing = [law for law in report["laws"] if law["status"] == "fails"]
+          print(report["summary"])
+          for law in failing:
+              print(f"  FAIL {law['law_id']}: simplest failing example {law['simplest_failing_example']}")
+          assert code == 1, f"expected result code 1 (some laws fail), got {code}"
+          assert failing and all(law["simplest_failing_example"] for law in failing)
+          PY
+          done
+
+  action-self-test:
+    name: lawkeep action on examples/billing
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Run the action from this checkout
+        id: lawkeep
+        uses: ./
+        with:
+          working-directory: examples/billing
+          lawkeep-spec: ${{ github.workspace }}
+          install-project: "false"
+          comment: "false"
+      - name: The action reports ALL LAWS HOLD for the example
+        env:
+          CODE: ${{ steps.lawkeep.outputs.result-code }}
+          VERDICT: ${{ steps.lawkeep.outputs.verdict }}
+        run: |
+          echo "result-code=$CODE verdict=$VERDICT"
+          test "$CODE" = "0"

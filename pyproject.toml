@@ -1,0 +1,105 @@
+[project]
+name = "lawkeep"
+dynamic = ["version"]
+description = "Laws for AI-assisted coding: the AI never changes your laws silently, and weakening a law needs your yes."
+readme = "README.md"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+requires-python = ">=3.10"
+authors = [{ name = "lawkeep contributors" }]
+keywords = ["testing", "property-based-testing", "hypothesis", "ai", "coding-agents", "laws"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Framework :: Pytest",
+    "Framework :: Hypothesis",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Testing",
+]
+dependencies = [
+    "hypothesis>=6.100",
+    "pytest>=8.0",
+    "coverage>=7.4",
+    "tomli>=2.0; python_version < '3.11'",
+    "tomli-w>=1.0",
+    "rich>=13.7",
+]
+
+[project.optional-dependencies]
+deep = ["crosshair-tool>=0.0.70", "hypothesis-crosshair>=0.0.18"]
+mcp = ["mcp>=1.2"]
+mutation = ["mutmut>=3.0"]
+
+[project.scripts]
+lawkeep = "lawkeep.cli:main"
+
+[project.entry-points.pytest11]
+lawkeep = "lawkeep.pytest_plugin"
+
+[project.urls]
+Homepage = "https://github.com/lawkeep/lawkeep"
+Source = "https://github.com/lawkeep/lawkeep"
+Issues = "https://github.com/lawkeep/lawkeep/issues"
+Changelog = "https://github.com/lawkeep/lawkeep/blob/main/CHANGELOG.md"
+
+[dependency-groups]
+dev = [
+    "pyright>=1.1.414",
+    "pytest>=8.0",
+    "ruff>=0.6",
+    # tomli is only a runtime dependency on Python 3.10, but pyright checks the 3.10 branch of
+    # `import tomllib / import tomli`, so it must be installed for the type checker everywhere.
+    "tomli>=2.0",
+]
+
+[build-system]
+requires = ["hatchling>=1.26"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+path = "src/lawkeep/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/lawkeep"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--import-mode=importlib"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["E501"]  # the formatter wraps code; long plain-English strings may stay long
+
+[tool.pyright]
+# Static type checking (docs/PLAN.md -> Decisions, 2026-11-23). The package is checked in strict
+# mode, the tests in standard mode. pythonVersion is the oldest Python lawkeep supports, so typing
+# that only works on newer versions is reported.
+include = ["src/lawkeep", "tests"]
+exclude = [
+    "**/__pycache__",
+    "**/.hypothesis",
+    "**/.venv",
+    "tests/fixtures",  # made-up projects that tests copy; not lawkeep code
+    "examples",
+]
+strict = ["src/lawkeep"]
+# Set explicitly (not left to the default) so basedpyright, which reads this same table in
+# editors such as Neovim, behaves like pyright: without it basedpyright would use its own
+# stricter "recommended" default for the tests.
+typeCheckingMode = "standard"
+pythonVersion = "3.10"
+venvPath = "."
+venv = ".venv"
+# Only `# pyright: ignore[rule]` comments silence an error (each with a reason); old-style
+# `# type: ignore` comments are not honoured, so they cannot hide errors without naming the rule.
+enableTypeIgnoreComments = false

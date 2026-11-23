@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "lawkeep": {
+      "command": "sh",
+      "args": [
+        "-c",
+        "if command -v lawkeep >/dev/null 2>&1; then exec lawkeep mcp; elif [ -x \"${CLAUDE_PROJECT_DIR:-.}/.venv/bin/lawkeep\" ]; then exec \"${CLAUDE_PROJECT_DIR:-.}/.venv/bin/lawkeep\" mcp; else echo 'lawkeep is not installed (not on PATH and not in .venv)' >&2; exit 1; fi"
+      ]
+    }
+  }
+}

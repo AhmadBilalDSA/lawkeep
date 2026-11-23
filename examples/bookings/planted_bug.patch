@@ -1,0 +1,11 @@
+--- a/src/bookings/calendar.py
++++ b/src/bookings/calendar.py
+@@ -67,7 +67,7 @@
+         return sorted(self._bookings.values(), key=lambda b: (b.slot.start, b.id))
+ 
+     def is_free(self, slot: Slot) -> bool:
+-        return not any(slot.overlaps(b.slot) for b in self._bookings.values())
++        return not any(b.slot.start <= slot.start < b.slot.end for b in self._bookings.values())
+ 
+     def book(self, slot: Slot, customer: str) -> Booking:
+         if slot.end <= slot.start:

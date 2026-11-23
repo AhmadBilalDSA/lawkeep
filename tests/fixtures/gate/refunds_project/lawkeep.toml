@@ -1,0 +1,6 @@
+[check.pr]
+examples = 60
+
+[check.deep]
+examples = 200
+derandomize = false

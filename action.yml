@@ -1,0 +1,429 @@
+# lawkeep GitHub Action
+#
+# Runs lawkeep's gate on a fresh checkout and posts ONE pull-request comment with:
+#   - the verdict (ALL LAWS HOLD / SOME LAWS FAIL / waiting for a person's decision),
+#   - the protection report ("only review what your laws don't protect"),
+#   - the law change report (every law added, changed or waiting in this pull request).
+# Later runs update the same comment instead of adding new ones.
+#
+# It never blocks a merge by itself: by default the job only fails on a setup problem
+# (result code 3). Set `fail-on-broken-laws: "true"` if you want failing laws to fail the job.
+# lawkeep records and shows; it does not force a review process on your team.
+#
+# Usage (see .github/workflows/templates/lawkeep.yml for a full workflow):
+#
+#   - uses: actions/checkout@v4
+#     with: { fetch-depth: 0 }          # the protection report diffs against the base branch
+#   - uses: lawkeep/lawkeep@v0          # (this action)
+#     with:
+#       fail-on-broken-laws: "false"
+#
+# Needs `permissions: pull-requests: write` in the workflow to post the comment. On pull
+# requests from forks the token is read-only: the action then writes the report to the job
+# summary only and says so in the log.
+
+name: lawkeep
+description: "Check your laws on every pull request and post one plain-English report: what holds, what changed, and what no law protects."
+author: lawkeep contributors
+branding:
+  icon: shield
+  color: blue
+
+inputs:
+  working-directory:
+    description: "Folder of the project (the one with lawkeep.toml)."
+    required: false
+    default: "."
+  python-version:
+    description: "Python version to run the laws with."
+    required: false
+    default: "3.12"
+  lawkeep-spec:
+    description: "What to install as lawkeep: a pip requirement such as 'lawkeep==0.1.0', a path, or a git URL."
+    required: false
+    default: "lawkeep"
+  install-project:
+    description: "Install the project itself first (pyproject.toml / setup.py, else requirements.txt) so laws can import it."
+    required: false
+    default: "true"
+  extra-packages:
+    description: "Extra pip requirements to install, separated by spaces (for example 'lawkeep[deep]')."
+    required: false
+    default: ""
+  profile:
+    description: "lawkeep check profile ('pr' by default from lawkeep.toml; 'deep' for nightly runs)."
+    required: false
+    default: ""
+  base-ref:
+    description: "Git ref to compare against for the protection report and the law change report. Defaults to the pull request's base commit."
+    required: false
+    default: ""
+  comment:
+    description: "Post or update the pull-request comment ('true' or 'false')."
+    required: false
+    default: "true"
+  fail-on-broken-laws:
+    description: "Fail the job when some laws fail (result code 1). Off by default: lawkeep reports, your team decides."
+    required: false
+    default: "false"
+  fail-on-waiting:
+    description: "Fail the job when something waits for a person's decision (result code 2), such as an unrecorded law change."
+    required: false
+    default: "false"
+  github-token:
+    description: "Token used to post the comment."
+    required: false
+    default: ${{ github.token }}
+
+outputs:
+  result-code:
+    description: "lawkeep check result code: 0 all laws hold, 1 some fail, 2 waiting for a person's decision, 3 setup problem."
+    value: ${{ steps.check.outputs.result-code }}
+  verdict:
+    description: "ALL LAWS HOLD, SOME LAWS FAIL, WAITING FOR YOUR DECISION or SETUP PROBLEM."
+    value: ${{ steps.check.outputs.verdict }}
+  summary:
+    description: "One plain-English line from lawkeep check."
+    value: ${{ steps.check.outputs.summary }}
+  check-json:
+    description: "Path of the lawkeep check JSON report."
+    value: ${{ steps.check.outputs.check-json }}
+  report-markdown:
+    description: "Path of the Markdown report (the comment body)."
+    value: ${{ steps.render.outputs.report-markdown }}
+  comment-url:
+    description: "URL of the pull-request comment, when one was posted or updated."
+    value: ${{ steps.comment.outputs.comment-url }}
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python-version }}
+
+    - name: Set up uv
+      uses: astral-sh/setup-uv@v6
+
+    - name: Install the project and lawkeep
+      id: install
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        LAWKEEP_SPEC: ${{ inputs.lawkeep-spec }}
+        INSTALL_PROJECT: ${{ inputs.install-project }}
+        EXTRA_PACKAGES: ${{ inputs.extra-packages }}
+        PYTHON_VERSION: ${{ inputs.python-version }}
+      run: |
+        set -euo pipefail
+        venv="$RUNNER_TEMP/lawkeep-venv"
+        uv venv --python "$PYTHON_VERSION" "$venv"
+        py="$venv/bin/python"
+        if [ "$INSTALL_PROJECT" = "true" ]; then
+          if [ -f pyproject.toml ] || [ -f setup.py ]; then
+            echo "Installing the project from $(pwd)"
+            uv pip install --python "$py" -e .
+          elif [ -f requirements.txt ]; then
+            echo "Installing requirements.txt"
+            uv pip install --python "$py" -r requirements.txt
+          else
+            echo "No pyproject.toml, setup.py or requirements.txt: laws import the code from the folders in lawkeep.toml [project] source."
+          fi
+        fi
+        # shellcheck disable=SC2086
+        uv pip install --python "$py" "$LAWKEEP_SPEC" $EXTRA_PACKAGES
+        echo "$venv/bin" >> "$GITHUB_PATH"
+        echo "python=$py" >> "$GITHUB_OUTPUT"
+        "$py" -m lawkeep --version
+
+    - name: Find the base commit
+      id: base
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        INPUT_BASE: ${{ inputs.base-ref }}
+        PR_BASE: ${{ github.event.pull_request.base.sha }}
+      run: |
+        set -uo pipefail
+        base="${INPUT_BASE:-$PR_BASE}"
+        if [ -n "$base" ] && ! git cat-file -e "$base^{commit}" 2>/dev/null; then
+          git fetch --no-tags --depth=1 origin "$base" >/dev/null 2>&1 || true
+        fi
+        if [ -n "$base" ] && ! git cat-file -e "$base^{commit}" 2>/dev/null; then
+          echo "::warning title=lawkeep::Base commit $base is not available (use actions/checkout with fetch-depth: 0). The protection report and the law change report will be skipped."
+          base=""
+        fi
+        echo "ref=$base" >> "$GITHUB_OUTPUT"
+
+    - name: lawkeep check
+      id: check
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        PROFILE: ${{ inputs.profile }}
+        BASE: ${{ steps.base.outputs.ref }}
+        PY: ${{ steps.install.outputs.python }}
+      run: |
+        set -uo pipefail
+        out="$RUNNER_TEMP/lawkeep-check.json"
+        args=(check --json)
+        [ -n "$PROFILE" ] && args+=(--profile "$PROFILE")
+        [ -n "$BASE" ] && args+=(--base "$BASE")
+        "$PY" -m lawkeep "${args[@]}" > "$out" 2> "$RUNNER_TEMP/lawkeep-check.stderr"
+        code=$?
+        cat "$RUNNER_TEMP/lawkeep-check.stderr" >&2
+        # Plain-English text for the log, too.
+        "$PY" - "$out" "$code" <<'PY' || true
+        import json, sys
+        path, code = sys.argv[1], int(sys.argv[2])
+        try:
+            report = json.load(open(path, encoding="utf-8"))
+        except Exception:
+            report = {"summary": "lawkeep check did not produce a JSON report."}
+        verdict = {0: "ALL LAWS HOLD", 1: "SOME LAWS FAIL", 2: "WAITING FOR YOUR DECISION"}.get(code, "SETUP PROBLEM")
+        summary = " ".join(str(report.get("summary", "")).split())
+        print(f"lawkeep: {summary}")
+        for law in report.get("laws") or []:
+            mark = {"holds": "ok  ", "fails": "FAIL", "error": "ERR ", "skipped": "SKIP"}.get(law.get("status"), "----")
+            print(f"  {mark} {law.get('law_id')}  \"{law.get('sentence') or ''}\"")
+        for issue in report.get("integrity") or []:
+            print(f"  ! {issue.get('severity', '')}: {issue.get('message', '')}")
+        import os
+        with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as f:
+            f.write(f"verdict={verdict}\nsummary={summary}\n")
+        PY
+        echo "result-code=$code" >> "$GITHUB_OUTPUT"
+        echo "check-json=$out" >> "$GITHUB_OUTPUT"
+        exit 0
+
+    - name: lawkeep report
+      id: report
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        BASE: ${{ steps.base.outputs.ref }}
+        PY: ${{ steps.install.outputs.python }}
+      run: |
+        set -uo pipefail
+        json_out="$RUNNER_TEMP/lawkeep-report.json"
+        md_out="$RUNNER_TEMP/lawkeep-report-native.md"
+        args=()
+        if [ -n "$BASE" ]; then
+          args+=(--base "$BASE")
+          # Law changes in this pull request = history entries that are not on the base commit.
+          since=$("$PY" - "$BASE" <<'PY'
+        import json, subprocess, sys
+        from datetime import datetime, timezone
+        base = sys.argv[1]
+        try:
+            old = subprocess.run(["git", "show", f"{base}:./laws/history.jsonl"], capture_output=True, text=True).stdout
+        except OSError:
+            old = ""
+        n = len([line for line in old.splitlines() if line.strip()])
+        try:
+            new = [line for line in open("laws/history.jsonl", encoding="utf-8").read().splitlines() if line.strip()]
+        except OSError:
+            new = []
+        added = new[n:]
+        if added:
+            print(json.loads(added[0]).get("timestamp", ""))
+        else:
+            print(datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%fZ"))
+        PY
+          )
+          [ -n "$since" ] && args+=(--since "$since")
+        else
+          args+=(--no-protection)
+        fi
+        # lawkeep's own Markdown first (it includes the protection report). The protection
+        # report plants bugs and runs the laws, so it runs only once: when the Markdown worked,
+        # the JSON run below skips it.
+        json_args=("${args[@]}")
+        "$PY" -m lawkeep report --format markdown "${args[@]}" > "$md_out" 2>/dev/null
+        md_code=$?
+        if [ "$md_code" -ne 3 ] && [ -s "$md_out" ]; then
+          echo "native-markdown=$md_out" >> "$GITHUB_OUTPUT"
+          json_args+=(--no-protection)
+        fi
+        "$PY" -m lawkeep report --json "${json_args[@]}" > "$json_out"
+        echo "report-code=$?" >> "$GITHUB_OUTPUT"
+        echo "report-json=$json_out" >> "$GITHUB_OUTPUT"
+        exit 0
+
+    - name: Write the comment body
+      id: render
+      shell: bash
+      env:
+        CHECK_JSON: ${{ steps.check.outputs.check-json }}
+        CHECK_CODE: ${{ steps.check.outputs.result-code }}
+        REPORT_JSON: ${{ steps.report.outputs.report-json }}
+        NATIVE_MD: ${{ steps.report.outputs.native-markdown }}
+        BASE: ${{ steps.base.outputs.ref }}
+        FAIL_ON_BROKEN: ${{ inputs.fail-on-broken-laws }}
+        PY: ${{ steps.install.outputs.python }}
+      run: |
+        set -uo pipefail
+        out="$RUNNER_TEMP/lawkeep-comment.md"
+        "$PY" - "$out" <<'PY'
+        import json, os, sys
+
+        def load(path):
+            try:
+                with open(path, encoding="utf-8") as f:
+                    return json.load(f)
+            except Exception:
+                return {}
+
+        def cell(text):
+            return " ".join(str(text or "").split()).replace("|", "\\|")
+
+        def example(ex):
+            if not ex:
+                return ""
+            if isinstance(ex, dict) and set(ex) == {"call"}:
+                return cell(ex["call"])
+            if isinstance(ex, dict):
+                return cell(", ".join(f"{k}={v}" for k, v in ex.items()))
+            return cell(ex)
+
+        check = load(os.environ.get("CHECK_JSON", ""))
+        report = load(os.environ.get("REPORT_JSON", "")) if os.environ.get("REPORT_JSON") else {}
+        code = int(os.environ.get("CHECK_CODE") or 3)
+        verdict = {0: "ALL LAWS HOLD", 1: "SOME LAWS FAIL", 2: "WAITING FOR YOUR DECISION"}.get(code, "SETUP PROBLEM")
+        lines = ["<!-- lawkeep-report -->", f"## lawkeep: {verdict}", ""]
+        lines.append(f"**{cell(check.get('summary') or 'lawkeep check did not produce a report.')}**")
+        if check.get("hint"):
+            lines += ["", f"What to do: {cell(check['hint'])}"]
+        if not check:
+            err_path = os.path.join(os.environ.get("RUNNER_TEMP", ""), "lawkeep-check.stderr")
+            err = open(err_path, encoding="utf-8").read().strip() if os.path.exists(err_path) else ""
+            if err:
+                tail = "\n".join(err.splitlines()[-20:])
+                lines += ["", "<details><summary>What lawkeep printed</summary>", "", "```", tail, "```", "</details>"]
+        lines.append("")
+
+        laws = check.get("laws") or []
+        if laws:
+            lines += ["| Law | Result | How it was checked | Simplest failing example |", "| --- | --- | --- | --- |"]
+            for law in laws:
+                status = {"holds": "holds", "fails": "**FAILS**", "error": "**ERROR**", "skipped": "skipped", "not_run": "not run"}.get(law.get("status"), law.get("status"))
+                how = f"{law.get('level', '')} · {law.get('examples_tried', 0)} examples"
+                lines.append(f"| {cell(law.get('sentence') or law.get('law_id'))}<br><sub>`{cell(law.get('law_id'))}`</sub> | {status} | {how} | {example(law.get('simplest_failing_example'))} |")
+            lines.append("")
+
+        native = os.environ.get("NATIVE_MD")
+        native = native if native and os.path.exists(native) else ""
+        problems = check.get("integrity") or []
+        if problems and not native:  # lawkeep's own Markdown report lists them already
+            lines += ["### Needs a person's attention", ""]
+            for issue in problems:
+                sev = issue.get("severity", "")
+                where = f" (`{cell(issue.get('path'))}`)" if issue.get("path") else ""
+                lines.append(f"- **{sev}**: {cell(issue.get('message'))}{where}")
+            lines.append("")
+
+        if native:
+            lines += [open(native, encoding="utf-8").read().strip(), ""]
+        else:
+            protection = report.get("protection") or {}
+            functions = protection.get("functions") or []
+            lines += ["### Only review what your laws don't protect", ""]
+            if not os.environ.get("BASE"):
+                lines.append("No base commit, so the protection report was skipped.")
+            elif not report or report.get("exit_code") == 3:
+                lines.append(f"The protection report could not run: {cell(report.get('summary') or 'no report')}")
+            elif not functions:
+                lines.append("No changed functions in this pull request.")
+            else:
+                order = {"not_protected": 0, "partly": 1, "protected": 2}
+                lines += ["| Changed function | Protection | Planted bugs caught | Laws |", "| --- | --- | --- | --- |"]
+                for fn in sorted(functions, key=lambda f: order.get(f.get("status"), 3)):
+                    status = {"not_protected": "**NOT protected: please read this code**", "partly": "partly protected", "protected": "protected"}.get(fn.get("status"), fn.get("status"))
+                    caught = f"{fn.get('planted_bugs_caught', 0)} of {fn.get('planted_bugs_total', 0)}"
+                    lines.append(f"| `{cell(fn.get('function'))}` | {status} | {caught} | {cell(', '.join(fn.get('laws') or []) or 'none')} |")
+            lines.append("")
+
+            changes = report.get("changes") or []
+            waiting = check.get("waiting") or []
+            lines += ["### Law changes in this pull request", ""]
+            if not changes and not waiting:
+                lines.append("No law changed.")
+            labels = {"added": "ADDED", "updated": "UPDATED", "removed": "REMOVED", "waiting": "WAITING", "rejected": "REJECTED", "unrecorded": "UNRECORDED"}
+            seen = set()
+            for ch in list(changes) + list(waiting):
+                key = ch.get("history_id") or id(ch)
+                if key in seen:
+                    continue
+                seen.add(key)
+                label = labels.get(ch.get("change"), str(ch.get("change", "")).upper())
+                sentence = ch.get("sentence") or ""
+                if ch.get("sentence_before") and ch.get("sentence_before") != sentence:
+                    sentence = f"\"{ch['sentence_before']}\" → \"{sentence}\""
+                elif sentence:
+                    sentence = f"\"{sentence}\""
+                bits = [b for b in [ch.get("direction"), ch.get("permission_used"), ch.get("approved_by") and f"yes from {ch['approved_by']}", ch.get("evidence")] if b]
+                lines.append(f"- **{label}** `{cell(ch.get('law_id'))}` {cell(sentence)}" + (f" · {cell(' · '.join(bits))}" if bits else ""))
+                if ch.get("reason"):
+                    lines.append(f"  - why: {cell(ch['reason'])}")
+            lines.append("")
+
+        if os.environ.get("FAIL_ON_BROKEN") == "true":
+            lines.append("<sub>This workflow fails the job when laws fail (fail-on-broken-laws).</sub>")
+        elif not native:
+            lines.append("<sub>lawkeep shows and records; it does not block this merge. Your team decides.</sub>")
+        text = "\n".join(lines) + "\n"
+        with open(sys.argv[1], "w", encoding="utf-8") as f:
+            f.write(text)
+        with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as f:
+            f.write(text)
+        PY
+        echo "report-markdown=$out" >> "$GITHUB_OUTPUT"
+
+    - name: Post or update the pull-request comment
+      id: comment
+      if: ${{ inputs.comment == 'true' && github.event.pull_request.number }}
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
+        REPO: ${{ github.repository }}
+        PR: ${{ github.event.pull_request.number }}
+        BODY_FILE: ${{ steps.render.outputs.report-markdown }}
+      run: |
+        set -uo pipefail
+        body=$(jq -Rs '{body: .}' < "$BODY_FILE")
+        existing=$(gh api --paginate "repos/$REPO/issues/$PR/comments" \
+          --jq '[.[] | select(.body | contains("<!-- lawkeep-report -->"))][0].id // empty' 2>/dev/null | head -n1)
+        if [ -n "$existing" ]; then
+          url=$(echo "$body" | gh api --method PATCH "repos/$REPO/issues/comments/$existing" --input - --jq .html_url)
+        else
+          url=$(echo "$body" | gh api --method POST "repos/$REPO/issues/$PR/comments" --input - --jq .html_url)
+        fi
+        if [ -z "${url:-}" ]; then
+          echo "::warning title=lawkeep::Could not post the pull-request comment (the token may be read-only, for example on a pull request from a fork). The report is in the job summary."
+        else
+          echo "lawkeep report: $url"
+          echo "comment-url=$url" >> "$GITHUB_OUTPUT"
+        fi
+        exit 0
+
+    - name: Decide the job result
+      shell: bash
+      env:
+        CODE: ${{ steps.check.outputs.result-code }}
+        SUMMARY: ${{ steps.check.outputs.summary }}
+        FAIL_ON_BROKEN: ${{ inputs.fail-on-broken-laws }}
+        FAIL_ON_WAITING: ${{ inputs.fail-on-waiting }}
+      run: |
+        case "$CODE" in
+          0) echo "lawkeep: $SUMMARY" ;;
+          1) if [ "$FAIL_ON_BROKEN" = "true" ]; then
+               echo "::error title=lawkeep::$SUMMARY"; exit 1
+             fi
+             echo "::warning title=lawkeep::$SUMMARY (not failing the job: fail-on-broken-laws is off)" ;;
+          2) if [ "$FAIL_ON_WAITING" = "true" ]; then
+               echo "::error title=lawkeep::$SUMMARY"; exit 1
+             fi
+             echo "::warning title=lawkeep::$SUMMARY" ;;
+          *) echo "::error title=lawkeep::Setup problem: $SUMMARY"; exit 1 ;;
+        esac

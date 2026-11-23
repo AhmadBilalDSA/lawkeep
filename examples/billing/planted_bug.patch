@@ -1,0 +1,8 @@
+--- a/src/billing/refunds.py
++++ b/src/billing/refunds.py
+@@ -34,4 +34,4 @@
+     if charge.total == 0:
+         return Refund(charge_id=charge.id, total=amount, fee_returned=Decimal("0.00"))
+     fee_returned = round_money(charge.card_fee * amount / charge.total)
+-    return Refund(charge_id=charge.id, total=amount, fee_returned=fee_returned)
++    return Refund(charge_id=charge.id, total=amount + fee_returned, fee_returned=fee_returned)

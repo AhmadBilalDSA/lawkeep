@@ -1,0 +1,50 @@
+# laws.lock - written by lawkeep; do not edit by hand.
+version = 1
+generated_at = "2026-11-22T16:24:01.208704Z"
+lawkeep_version = "0.1.0.dev0"
+
+[files]
+"lawkeep.toml" = "sha256:3c1414b842b8092bb7f852200504b73bf8781b3c48a275c75ad95bcb30a5a2ec"
+"laws/discount_amounts.py" = "sha256:0de065d6e6deef6a6968b7371aca0b745be310aca5e24e1d8b9ebe9916ec42bc"
+"laws/discounts.py" = "sha256:86718024384ddd38f614f23613254ca7d2ceb0d01ebb6e0ae80df7ee36f2b891"
+"laws/refunds.py" = "sha256:d0aedd6f4bef45d2f3dff21a5f50371298764ee325bab7063d75f94895fe7799"
+"laws/rounding.py" = "sha256:cb0749a6fa3ea82edab451564c1bcc6c8d9ddd0ff5bed27a67f2206a1772b49b"
+"laws/strategies.py" = "sha256:e9e1c8a3f227e35ff92503e667b9692300ce74e496ea70fc0b9541dca9ff0bcb"
+
+[laws."discount_amounts.discount_takes_off_exactly_what_it_promises"]
+sentence = "Each discount code takes off exactly what it promises: SAVE10 10%, SAVE25 25%, FIVEOFF $5.00 (never below $0.00), and no code or an unknown code takes off nothing"
+file = "laws/discount_amounts.py"
+hash = "sha256:c9da75488c81a12229b8a468e57ae5c8df394d7877fbfb2f39bc609ab2531aaa"
+
+[laws."discounts.discount_stays_between_zero_and_price"]
+sentence = "A discount code never raises the price and never takes it below zero"
+file = "laws/discounts.py"
+hash = "sha256:878c5e44dca795ca560a38de612b1a4c4bc28e35bccf038c9a45bdfd4eeae29c"
+
+[laws."refunds.full_refund_gives_back_exact_payment"]
+sentence = "Refunding exactly what was paid gives back exactly the payment and the whole card fee"
+file = "laws/refunds.py"
+hash = "sha256:e6ce9d4bc0cf510dd4a266d94af0570cc826c4bd8b517142d728000114e05d83"
+
+[laws."refunds.partial_refund_is_exact_and_fee_share_is_fair"]
+sentence = "A partial refund gives back exactly the amount asked for and a fair share of the card fee"
+file = "laws/refunds.py"
+hash = "sha256:a055503938395597f8452e43799bb86c52e49ca8afef94f688e51e639535152e"
+
+[laws."refunds.refund_never_exceeds_payment"]
+sentence = "A refund never exceeds the original payment"
+file = "laws/refunds.py"
+hash = "sha256:2cc887a10c6ea3145ebab2f96dc4b8d13b67261a21f24f493906f2e53fec0423"
+
+[laws."rounding.rounding_is_to_the_nearest_cent"]
+sentence = "Rounding money gives whole cents and is never off by more than half a cent"
+file = "laws/rounding.py"
+hash = "sha256:53f6670c7561169ed29b3593608eb17f2607fa7571937fa288866b1a78f01951"
+
+[append_only."laws/failing_examples.jsonl"]
+lines = 0
+prefix_sha256 = "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+
+[append_only."laws/history.jsonl"]
+lines = 7
+prefix_sha256 = "sha256:818fe0aba81ee1ad455528718b9427124f83a787daf84d87662ed33512e4e380"

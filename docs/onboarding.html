@@ -1,0 +1,1396 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>lawkeep onboarding guide</title>
+<meta name="description" content="How lawkeep works, from the first idea to the last module: an onboarding guide for new developers, interns and senior engineers alike.">
+<style>
+:root {
+  --bg: #fbfaf7;
+  --surface: #ffffff;
+  --surface2: #f3f1ec;
+  --text: #1d1f23;
+  --muted: #5b6070;
+  --border: #dcd8cf;
+  --accent: #1f5fbf;
+  --accent-soft: #e6eefb;
+  --ok: #1d7a46;
+  --ok-soft: #e4f4ea;
+  --warn: #9a5b00;
+  --warn-soft: #fbf0dc;
+  --bad: #b3261e;
+  --bad-soft: #fbe6e4;
+  --deep: #6b3fa0;
+  --deep-soft: #f0e8fa;
+  --code-bg: #f4f2ee;
+  --code-text: #23262d;
+  --shadow: 0 1px 2px rgba(0,0,0,.05);
+  --g-foundation: #e9eef8;
+  --g-gate: #e7f3ec;
+  --g-life: #fbf1e1;
+  --g-strength: #f2eafa;
+  --g-adapters: #e6f2f5;
+  --g-disk: #f1efe9;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #15171b;
+    --surface: #1c1f24;
+    --surface2: #23272e;
+    --text: #e6e7ea;
+    --muted: #a3a8b5;
+    --border: #363b45;
+    --accent: #79a8f2;
+    --accent-soft: #1f2a3d;
+    --ok: #6cc893;
+    --ok-soft: #18291f;
+    --warn: #e5b45d;
+    --warn-soft: #2e2516;
+    --bad: #f08c84;
+    --bad-soft: #321b1a;
+    --deep: #c3a2ee;
+    --deep-soft: #2a2236;
+    --code-bg: #20242a;
+    --code-text: #dfe2e8;
+    --shadow: none;
+    --g-foundation: #1f2738;
+    --g-gate: #1b2b22;
+    --g-life: #2e2618;
+    --g-strength: #29213a;
+    --g-adapters: #1a2a2f;
+    --g-disk: #25272b;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #15171b; --surface: #1c1f24; --surface2: #23272e; --text: #e6e7ea; --muted: #a3a8b5;
+  --border: #363b45; --accent: #79a8f2; --accent-soft: #1f2a3d; --ok: #6cc893; --ok-soft: #18291f;
+  --warn: #e5b45d; --warn-soft: #2e2516; --bad: #f08c84; --bad-soft: #321b1a; --deep: #c3a2ee;
+  --deep-soft: #2a2236; --code-bg: #20242a; --code-text: #dfe2e8; --shadow: none;
+  --g-foundation: #1f2738; --g-gate: #1b2b22; --g-life: #2e2618; --g-strength: #29213a;
+  --g-adapters: #1a2a2f; --g-disk: #25272b;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 72px; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 17px;
+  line-height: 1.65;
+  -webkit-text-size-adjust: 100%;
+}
+a { color: var(--accent); }
+code, pre, kbd { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace; }
+code { background: var(--code-bg); color: var(--code-text); padding: .08em .35em; border-radius: 4px; font-size: .88em; overflow-wrap: anywhere; }
+pre {
+  background: var(--code-bg); color: var(--code-text);
+  border: 1px solid var(--border); border-radius: 8px;
+  padding: 14px 16px; overflow-x: auto; font-size: 14px; line-height: 1.5;
+  max-width: 100%;
+}
+pre code { background: none; padding: 0; font-size: inherit; overflow-wrap: normal; }
+.c { color: var(--muted); }
+h1, h2, h3, h4 { line-height: 1.25; }
+h1 { font-size: 2.1rem; margin: .2em 0 .3em; letter-spacing: -.01em; }
+h2 { font-size: 1.6rem; margin: 2.4em 0 .6em; padding-top: .6em; border-top: 1px solid var(--border); }
+h3 { font-size: 1.22rem; margin: 1.8em 0 .5em; }
+h4 { font-size: 1.02rem; margin: 1.4em 0 .4em; }
+p, li { max-width: 74ch; }
+.layout { display: flex; align-items: flex-start; max-width: 1280px; margin: 0 auto; }
+nav#toc {
+  position: sticky; top: 0; height: 100vh; overflow-y: auto;
+  width: 280px; flex: 0 0 280px; padding: 24px 16px 40px 20px;
+  border-right: 1px solid var(--border); background: var(--surface);
+  font-size: 14.5px;
+}
+nav#toc .brand { font-weight: 700; font-size: 1.05rem; margin-bottom: 12px; }
+nav#toc ol { list-style: none; padding: 0; margin: 0; }
+nav#toc li { margin: 0; max-width: none; }
+nav#toc a { display: block; padding: 4px 8px; border-radius: 6px; color: var(--text); text-decoration: none; }
+nav#toc a:hover { background: var(--surface2); }
+nav#toc a.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+nav#toc ol ol a { padding-left: 22px; font-size: 13.5px; color: var(--muted); }
+nav#toc ol ol a.active { color: var(--accent); }
+main { flex: 1 1 auto; min-width: 0; padding: 24px 40px 80px; }
+.topbar { display: none; }
+.lead { font-size: 1.15rem; color: var(--muted); max-width: 70ch; }
+.box {
+  border: 1px solid var(--border); border-left-width: 4px; border-radius: 8px;
+  padding: 12px 16px; margin: 1.2em 0; background: var(--surface); box-shadow: var(--shadow);
+}
+.box > :first-child { margin-top: 0; }
+.box > :last-child { margin-bottom: 0; }
+.box .t { font-weight: 700; display: block; margin-bottom: 4px; }
+.tip { border-left-color: var(--ok); background: var(--ok-soft); }
+.warn { border-left-color: var(--warn); background: var(--warn-soft); }
+.danger { border-left-color: var(--bad); background: var(--bad-soft); }
+.note { border-left-color: var(--accent); background: var(--accent-soft); }
+.example { border-left-color: var(--deep); background: var(--deep-soft); }
+.uth {
+  border: 1px dashed var(--border); border-radius: 10px; margin: 1.3em 0;
+  background: var(--surface); padding: 0;
+}
+.uth > summary {
+  cursor: pointer; padding: 10px 16px; font-weight: 700; list-style: none;
+  display: flex; align-items: center; gap: 10px;
+}
+.uth > summary::-webkit-details-marker { display: none; }
+.uth > summary::before {
+  content: "UNDER THE HOOD"; font-size: 11px; letter-spacing: .08em;
+  background: var(--text); color: var(--bg); padding: 2px 7px; border-radius: 4px; font-weight: 700;
+}
+.uth > summary::after { content: "▸"; margin-left: auto; color: var(--muted); transition: transform .15s; }
+.uth[open] > summary::after { transform: rotate(90deg); }
+.uth > .in { padding: 4px 18px 14px; border-top: 1px dashed var(--border); }
+.tablewrap { overflow-x: auto; max-width: 100%; margin: 1em 0; }
+table { border-collapse: collapse; width: 100%; font-size: 15px; background: var(--surface); }
+th, td { border: 1px solid var(--border); padding: 7px 10px; text-align: left; vertical-align: top; }
+th { background: var(--surface2); font-weight: 650; }
+td code { font-size: .85em; }
+.facts { width: 100%; }
+.facts th { width: 150px; }
+.pill { display: inline-block; font-size: 12px; font-weight: 700; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--border); white-space: nowrap; }
+.p0 { color: var(--ok); background: var(--ok-soft); }
+.p1 { color: var(--bad); background: var(--bad-soft); }
+.p2 { color: var(--warn); background: var(--warn-soft); }
+.p3 { color: var(--deep); background: var(--deep-soft); }
+.path { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 1em 0; }
+.path .step { border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; background: var(--surface); }
+.path .step b { display: block; }
+.path .step span { color: var(--muted); font-size: 14.5px; }
+.flow { counter-reset: s; list-style: none; padding-left: 0; }
+.flow > li { counter-increment: s; position: relative; padding-left: 40px; margin: .7em 0; }
+.flow > li::before {
+  content: counter(s); position: absolute; left: 0; top: 1px; width: 26px; height: 26px; border-radius: 50%;
+  background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+}
+.diagram { overflow-x: auto; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); padding: 10px; margin: 1em 0; }
+.diagram svg { display: block; min-width: 760px; width: 100%; height: auto; }
+.svg-box { fill: var(--surface); stroke: var(--border); stroke-width: 1.2; }
+.svg-t { fill: var(--text); font: 600 13px -apple-system, "Segoe UI", Roboto, Arial, sans-serif; }
+.svg-s { fill: var(--muted); font: 11.5px ui-monospace, Menlo, Consolas, monospace; }
+.svg-h { fill: var(--text); font: 700 12px -apple-system, "Segoe UI", Roboto, Arial, sans-serif; letter-spacing: .06em; }
+.svg-line { stroke: var(--muted); stroke-width: 1.4; fill: none; }
+.svg-dash { stroke: var(--muted); stroke-width: 1.2; fill: none; stroke-dasharray: 4 4; }
+.svg-arrow { fill: var(--muted); }
+.gf { fill: var(--g-foundation); } .gg { fill: var(--g-gate); } .gl { fill: var(--g-life); }
+.gs { fill: var(--g-strength); } .ga { fill: var(--g-adapters); } .gd { fill: var(--g-disk); }
+.group-stroke { stroke: var(--border); stroke-width: 1; }
+dl.gloss dt { font-weight: 700; margin-top: .9em; }
+dl.gloss dd { margin: .2em 0 0 0; max-width: 74ch; }
+.faq h4 { margin-bottom: .2em; }
+footer { color: var(--muted); font-size: 14px; margin-top: 4em; border-top: 1px solid var(--border); padding-top: 1em; }
+.theme-btn { margin-top: 18px; font-size: 13px; background: var(--surface2); color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 4px 10px; cursor: pointer; }
+@media (max-width: 960px) {
+  .layout { display: block; }
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 20; background: var(--surface);
+    border-bottom: 1px solid var(--border); padding: 10px 16px;
+  }
+  .topbar b { font-size: 15px; }
+  .topbar button { font: inherit; font-size: 14px; background: var(--surface2); color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 5px 12px; cursor: pointer; }
+  nav#toc {
+    display: none; position: fixed; top: 52px; left: 0; right: 0; bottom: 0; width: auto; height: auto;
+    z-index: 19; border-right: none; padding: 12px 16px 40px;
+  }
+  nav#toc.open { display: block; }
+  nav#toc .brand { display: none; }
+  main { padding: 12px 16px 60px; }
+  h1 { font-size: 1.7rem; }
+  h2 { font-size: 1.35rem; }
+  body { font-size: 16px; }
+  .facts th { width: 110px; }
+}
+</style>
+</head>
+<body>
+<div class="topbar"><b>lawkeep onboarding</b><button id="tocbtn" aria-expanded="false" aria-controls="toc">Contents</button></div>
+<div class="layout">
+<nav id="toc" aria-label="Table of contents">
+  <div class="brand">lawkeep onboarding</div>
+  <ol>
+    <li><a href="#start">0. How to read this guide</a></li>
+    <li><a href="#why">1. What lawkeep is and why</a></li>
+    <li><a href="#ideas">2. Key ideas in plain words</a>
+      <ol>
+        <li><a href="#idea-law">Laws and property-based testing</a></li>
+        <li><a href="#idea-shrink">Shrinking and saved failures</a></li>
+        <li><a href="#idea-drafts">Drafts, proposals, approval</a></li>
+        <li><a href="#idea-perm">Permissions by direction</a></li>
+        <li><a href="#idea-history">Law history and the lock</a></li>
+        <li><a href="#idea-gate">The gate and result codes</a></li>
+        <li><a href="#idea-strength">Law strength</a></li>
+        <li><a href="#idea-protect">The protection report</a></li>
+        <li><a href="#idea-ladder">The guarantee ladder</a></li>
+      </ol>
+    </li>
+    <li><a href="#day">3. A day in the life</a></li>
+    <li><a href="#longruns">3b. Long runs without a person</a></li>
+    <li><a href="#commands">4. Every command</a>
+      <ol>
+        <li><a href="#cmd-init">init</a></li>
+        <li><a href="#cmd-draft">draft</a></li>
+        <li><a href="#cmd-approve">approve</a></li>
+        <li><a href="#cmd-check">check</a></li>
+        <li><a href="#cmd-strength">strength</a></li>
+        <li><a href="#cmd-propose">propose</a></li>
+        <li><a href="#cmd-report">report</a></li>
+        <li><a href="#cmd-hook">hook</a></li>
+        <li><a href="#cmd-mcp">mcp</a></li>
+      </ol>
+    </li>
+    <li><a href="#arch">5. Architecture</a>
+      <ol>
+        <li><a href="#arch-diagram">The big picture</a></li>
+        <li><a href="#arch-cli">CLI and output</a></li>
+        <li><a href="#arch-foundation">Foundation</a></li>
+        <li><a href="#arch-history">Lock and history</a></li>
+        <li><a href="#arch-gate">The gate</a></li>
+        <li><a href="#arch-life">Law lifecycle</a></li>
+        <li><a href="#arch-strength">Strength and protection</a></li>
+        <li><a href="#arch-adapters">Agent adapters</a></li>
+        <li><a href="#arch-ci">GitHub Action and CI</a></li>
+        <li><a href="#arch-wrap">Tools lawkeep wraps</a></li>
+      </ol>
+    </li>
+    <li><a href="#tour">6. Repository tour</a></li>
+    <li><a href="#data">7. Data formats</a></li>
+    <li><a href="#safety">8. Safety model</a></li>
+    <li><a href="#dev">9. Developing on lawkeep</a></li>
+    <li><a href="#glossary">10. Glossary and FAQ</a></li>
+  </ol>
+  <button class="theme-btn" id="themebtn" type="button">Switch light / dark</button>
+</nav>
+
+<main>
+<header>
+  <h1>lawkeep onboarding guide</h1>
+  <p class="lead">Everything a new developer needs to understand lawkeep: what it is for, how each part works, why it is built this way, and where to find the code. You do not need to know anything about this codebase, or about property-based testing, to start.</p>
+  <div class="box note"><span class="t">Status as of 2026-11-22</span>
+  lawkeep v0.1 is <b>built and integrated, but not committed or released</b>. All nine commands exist. Only Python 3.12 on Linux has been tested. The Codex, Cursor and Copilot adapters have never run inside the real agents, and the GitHub Action has never run on GitHub. These gaps are named again where they matter. The design source of truth is <code>docs/PLAN.md</code>. The code contract is <code>docs/ARCHITECTURE.md</code>.</div>
+</header>
+
+<!-- ============================================================ 0 -->
+<section id="start">
+<h2>0. How to read this guide</h2>
+<p>This guide is written for two kinds of readers at once: interns who are new to all of this, and senior developers who want exact detail.</p>
+<p>Each topic is written in two layers:</p>
+<ul>
+  <li><b>The plain layer</b> comes first. Short sentences, analogies, and a running example. You can read only this layer and still understand the whole system.</li>
+  <li><b>The technical layer</b> is in boxes marked <b>UNDER THE HOOD</b>. They hold exact module and function names, data flow, file formats, process details, and design trade-offs. Click a box to open or close it. Seniors can open them all; interns can skip them on a first read.</li>
+</ul>
+<p>Callout boxes mean: <span class="pill p0">Tip</span> a helpful hint, <span class="pill p2">Watch out</span> a common trap, <span class="pill p1">Limit</span> something lawkeep does not do, <span class="pill p3">Example</span> a worked example.</p>
+
+<h3>The running example</h3>
+<div class="box example"><span class="t">Corner Shop billing (made up)</span>
+<p>All through this guide we use one made-up shop. It takes card payments. The card company keeps a 2% fee. When the shop refunds a customer, it gets back the matching share of that fee. The one rule we care about most is:</p>
+<p style="font-size:1.1em"><b>"A refund never exceeds the original payment."</b></p>
+<p>This project really exists in the repository as <code>examples/billing</code>. You can run every command in this guide against a copy of it.</p>
+</div>
+
+<h3>Learning path for interns</h3>
+<div class="path">
+  <div class="step"><b>Day 1: the idea</b><span>Sections 1 and 2. Read only the plain layer. Then skim the glossary (section 10).</span></div>
+  <div class="step"><b>Day 1: see it work</b><span>Section 3, then run the billing example yourself (section 9, "Try it in five minutes").</span></div>
+  <div class="step"><b>Day 2: the commands</b><span>Section 4, plain layer. Run <code>check</code>, <code>strength</code> and <code>report</code> on a copy of the example.</span></div>
+  <div class="step"><b>Day 3: the code</b><span>Section 5 (architecture) and section 6 (repository tour). Now open the "Under the hood" boxes.</span></div>
+  <div class="step"><b>Day 4: the details</b><span>Sections 7 (data formats) and 8 (safety model). Then section 9 before you change anything.</span></div>
+</div>
+<p>Senior developers can go straight to section 5, then 7, 8 and 9, and use sections 2 to 4 as reference.</p>
+</section>
+
+<!-- ============================================================ 1 -->
+<section id="why">
+<h2>1. What lawkeep is and why it exists</h2>
+
+<h3>The problem</h3>
+<p>Coding agents (AI tools such as Claude Code, Codex, Cursor and Copilot) now write a lot of code. The usual safety net is tests: small programs that check the code. Tests were designed for human authors. With an AI author they fail in four ways:</p>
+<ol>
+  <li><b>Examples miss cases.</b> A normal test checks a few inputs, for example "refund $10 of a $40 payment". The code can still be wrong for inputs nobody tried, such as a $0.25 payment.</li>
+  <li><b>The agent can move the goalposts.</b> Asked to make a failing test pass, an agent may edit the test instead of the code: weaken a check, skip the test, or special-case the one input that failed. To the reviewer this looks like any other edit. Research (ImpossibleBench, CircumEval, cited in <code>docs/PLAN.md</code>) shows agents really do this.</li>
+  <li><b>Nobody knows how strong the tests are.</b> A test that checks almost nothing still shows green.</li>
+  <li><b>Nobody wants to write rules by hand.</b> Not even developers.</li>
+</ol>
+<p>The result: a human has to read every line the agent writes. That does not scale.</p>
+
+<h3>The answer: laws</h3>
+<p>lawkeep gives you <b>laws</b>. A law is a rule the code must obey for <em>every</em> input, written as one plain sentence plus an automatic check. Think of laws as the house rules of your codebase. The agent writes the code and even writes the checks, but it may not quietly rewrite the house rules.</p>
+<ul>
+  <li><b>Agents write laws; people decide.</b> A coding agent drafts each law. A person approves it by reading the sentence and a table of concrete examples, not code.</li>
+  <li><b>Every law change is recorded.</b> What changed, who changed it, why, and who said yes.</li>
+  <li><b>Weakening needs a person's yes.</b> Making a law stricter can happen on its own, if you allow it. Making it looser always waits for a person.</li>
+  <li><b>One gate.</b> <code>lawkeep check</code> answers <code>ALL LAWS HOLD</code> or <code>SOME LAWS FAIL</code>.</li>
+  <li><b>Laws get graded.</b> lawkeep plants bugs on purpose and checks whether your laws notice, so you know when a law is too weak.</li>
+</ul>
+
+<div class="box note"><span class="t">The promise, in one line</span>
+"The AI never changes your laws silently; weakening needs your yes."</div>
+<div class="box tip"><span class="t">The headline</span>
+"<b>Only review what your laws don't protect.</b>" On every change, lawkeep shows which changed functions are protected by laws, and which ones a person still needs to read.</div>
+
+<h3>What lawkeep does NOT promise</h3>
+<div class="box danger"><span class="t">Limit</span>
+<ul>
+  <li>It does not promise that your code is correct beyond what your laws say. A guarantee is only as strong as the laws.</li>
+  <li>It does not promise that an agent <em>cannot</em> get around it. The promise is "never <b>silently</b>": tricks get flagged, not made impossible.</li>
+  <li>Nothing in v0.1 is "proven". That word is reserved for machine-checked proofs (level L4, planned for v0.5). Never write "proven" or "foolproof" in code, docs or output.</li>
+  <li>It does not police your team. No forced reviews, no branch protection, no blocking by default. It records and shows; people decide.</li>
+</ul></div>
+
+<h3>Where the idea comes from</h3>
+<p>The inspiration is Bend 2, a language where humans own a <code>LAWS.bend</code> file and a compiler checks proofs against it. lawkeep brings that idea to the languages and coding agents people already use, without a new language. v0.1 is Python only.</p>
+</section>
+
+<!-- ============================================================ 2 -->
+<section id="ideas">
+<h2>2. Key ideas in plain words</h2>
+<p>This section explains every idea you need, one at a time, each with the billing example.</p>
+
+<h3 id="idea-law">2.1 Laws and property-based testing</h3>
+<p>A normal test (an "example test") says: "for <em>this</em> input, expect <em>this</em> answer". A <b>property</b> says: "for <em>any</em> input, this must be true". A law is a property with a plain-English sentence on top.</p>
+<p><b>Property-based testing</b> means: a tool invents many inputs for you (hundreds or thousands), runs your check on each, and reports any input that breaks it. Think of a tireless tester who tries every strange case: a $0.00 payment, a refund of exactly the full amount, a refund of one cent.</p>
+<p>The tool lawkeep uses for this is <b>Hypothesis</b>, a well-known Python library. lawkeep does not re-invent it. It wraps it.</p>
+<p>Here is the real law from the example (<code>examples/billing/laws/refunds.py</code>):</p>
+<pre><code><span class="c"># laws/refunds.py</span>
+from billing.refunds import RefundTooLarge, refund
+from lawkeep import given, law, st
+
+@law("A refund never exceeds the original payment")      <span class="c"># the sentence people read</span>
+@given(charge=st.charges(), amount=st.money(0, 1000))     <span class="c"># Hypothesis invents the inputs</span>
+def refund_never_exceeds_payment(charge, amount):
+    try:
+        result = refund(charge, amount)                   <span class="c"># call the real code</span>
+    except RefundTooLarge:
+        return                                            <span class="c"># refusing a too-large refund is fine</span>
+    assert result.total &lt;= charge.total                   <span class="c"># the rule itself</span></code></pre>
+<p>Words you will see:</p>
+<ul>
+  <li><b>Input</b>: a value lawkeep feeds the law. Here: <code>charge</code> and <code>amount</code>.</li>
+  <li><b>Generator</b> (Hypothesis calls it a <em>strategy</em>): a recipe for making inputs. <code>st.money(0, 1000)</code> makes amounts from $0.00 to $1,000.00. <code>st.charges()</code> is a project-specific generator defined in <code>laws/strategies.py</code>.</li>
+  <li><b>Law id</b>: a stable name, built from the file path inside <code>laws/</code> plus the function name: <code>refunds.refund_never_exceeds_payment</code>.</li>
+</ul>
+<div class="box tip"><span class="t">Tip</span>A law may describe its inputs in words for people: <code>@law("...", inputs={"charge": "a payment the customer made"})</code>. Without that, lawkeep says something like "a sample charge that lawkeep made up for testing" and suggests adding descriptions.</div>
+<details class="uth"><summary>The @law decorator and st</summary><div class="in">
+<ul>
+  <li><code>src/lawkeep/_law.py</code>: <code>law(sentence, *, id=None, inputs=None)</code>. It does not change how the test runs. It attaches a <code>LawMeta</code> object as <code>__lawkeep_law__</code> and a pytest marker <code>@pytest.mark.law(...)</code>. Works above or below <code>@given</code>, on plain functions (an L1 example law), and on Hypothesis <code>RuleBasedStateMachine</code> classes.</li>
+  <li><code>make_law_id</code>: path inside <code>laws/</code> with dots, no <code>.py</code>, a leading <code>drafts</code> folder dropped (so a draft keeps its id when approved), plus the qualname. <code>@law(..., id="R7")</code> overrides.</li>
+  <li><code>src/lawkeep/strategies.py</code> is <code>st</code>: everything in <code>hypothesis.strategies</code>, plus <code>money()</code> (Decimal), <code>percentages()</code>, <code>non_empty_text()</code>, <code>ids()</code>. Any unknown name is looked up in the project's <code>laws/strategies.py</code>, imported once as module <code>lawkeep_project_strategies</code>. Names Hypothesis already has (<code>times</code>, <code>dates</code>, <code>text</code>) always mean Hypothesis's version.</li>
+  <li><code>src/lawkeep/__init__.py</code> exposes <code>law, given, st, example, settings, assume, note, event, get_law, is_law, LawMeta</code> lazily, so CLI start-up does not import Hypothesis or pytest.</li>
+  <li>A law is <em>any</em> function or class decorated with <code>@law</code>, whatever its name. Plain pytest only collects <code>test_*</code> names, so lawkeep's pytest plugin collects <code>@law</code> items itself.</li>
+</ul>
+</div></details>
+
+<h3 id="idea-shrink">2.2 Shrinking and saved failing examples</h3>
+<p>When Hypothesis finds an input that breaks a law, the first one it finds is often big and messy, such as a $734.18 payment with a discount code. Hypothesis then <b>shrinks</b> it: it keeps trying smaller, simpler inputs that still break the law, until it cannot simplify further. You get the <b>simplest failing example</b>.</p>
+<div class="box example"><span class="t">Example: the planted bug</span>
+<p>The example ships a patch, <code>planted_bug.patch</code>, that makes a refund also hand back the fee share. With it applied, <code>lawkeep check</code> reports (in words): "The input that breaks it: a charge of $0.25 with no discount code. The law expected at most 0.25, but the code gave 0.26." A tiny, readable case that a developer (or an agent) can fix right away.</p></div>
+<p>Every failing input lawkeep finds is <b>saved</b> in <code>laws/failing_examples.jsonl</code> and tried again on <em>every</em> later run, forever. Agents may add to this list but never remove from it. So a bug that was found once can never quietly come back.</p>
+<details class="uth"><summary>How replay works</summary><div class="in">
+<p>Hypothesis already knows how to replay failures: it stores the <em>choice sequence</em> (the random decisions that built the input) in an example database. lawkeep wraps that. During a gate run, each law gets its own in-memory Hypothesis database (<code>pytest_plugin._make_database</code>). Reading the law's main key returns every choice sequence saved for that law in the ledger, so Hypothesis replays them first. Entries are keyed by <b>law id</b>, not by Hypothesis's hash of the test source, so a saved failure keeps replaying after the law is edited or reformatted. New failing sequences come back to the parent, and only <code>commands/check.py</code> appends them, through <code>ledger.add</code>. The runner itself never writes the ledger, so strength and draft runs cannot pollute it.</p>
+<p>Input values are shown in words by <code>src/lawkeep/readable.py</code>: it parses Python text such as <code>charge(price=Decimal('0.25'), discount_code=None)</code> with <code>ast</code> (never executes it) and returns "a charge of $0.25 with no discount code". "$" is used only for money-like names (price, amount, total, fee...). When unsure it returns <code>None</code> and the raw value is shown. <code>--details</code> and <code>--json</code> always keep the raw value.</p>
+</div></details>
+
+<h3 id="idea-drafts">2.3 Drafts, proposals and approval</h3>
+<ul>
+  <li>A <b>draft</b> is a new law a coding agent wrote that nobody has approved yet. It lives in <code>laws/drafts/</code>. The gate ignores drafts until a person approves them.</li>
+  <li>A <b>proposal</b> is a requested change to an approved law (or its deletion). Weakening proposals wait for a person's yes.</li>
+  <li><b>Approval</b> is a person saying yes or no. The person sees the law's sentence, whether it works with today's code, how strong it is, and a table of real examples: "charge $40.00, refund $50 → refund() refused (RefundTooLarge) → follows the law: yes". They never have to read code.</li>
+</ul>
+<p>Why a <em>separate</em> agent session writes drafts: if the same agent that wrote buggy code also wrote the law, the law might just describe the bug. So <code>lawkeep draft</code> starts a fresh session of your own coding agent and gives it what you <em>asked for</em> and the function signatures, not the function bodies.</p>
+
+<h3 id="idea-perm">2.4 Permissions by direction</h3>
+<p>Every change to a law has a <b>direction</b>:</p>
+<div class="tablewrap"><table>
+<tr><th>Direction</th><th>Meaning</th><th>Billing example</th><th>Default</th></tr>
+<tr><td><b>stricter</b></td><td>the law demands more</td><td>add "a refund is never negative"</td><td>automatic; you are told</td></tr>
+<tr><td><b>same</b></td><td>same meaning, only names changed</td><td><code>refund</code> renamed to <code>issue_refund</code> everywhere</td><td>automatic; you are told</td></tr>
+<tr><td><b>looser</b></td><td>the law demands less</td><td>"a refund never exceeds the payment plus $1"</td><td><b>always asks</b> (cannot be turned off)</td></tr>
+<tr><td><b>unclear</b></td><td>lawkeep cannot tell</td><td>the check was rewritten in a different way</td><td>asks</td></tr>
+</table></div>
+<p>lawkeep decides the direction by <b>evidence</b>, not by trusting the agent: it runs the old and new versions of the law on the same inputs and on the same deliberately broken code, and compares what each one rejects. Deleting a law, skipping it, or trying fewer cases is always "looser". The person sets the rules once in <code>lawkeep.toml</code>:</p>
+<pre><code>[permissions]          <span class="c"># "auto" = go ahead and tell me; "ask" = wait for my yes</span>
+add_law       = "auto" <span class="c"># stricter</span>
+add_example   = "auto" <span class="c"># stricter (a saved case)</span>
+rename_target = "auto" <span class="c"># same meaning</span>
+change_law    = "ask"  <span class="c"># unclear</span>
+weaken_law    = "ask"  <span class="c"># looser: ALWAYS "ask" ("auto" is ignored with a warning)</span></code></pre>
+<div class="box example"><span class="t">Example from a real run while writing this guide</span>
+An agent proposed changing <code>&lt;= charge.total</code> to <code>&lt;= charge.total + 1</code>. Both versions gave the same answers on 200 inputs and on 40 broken versions of the code (today's code never produces such a refund). lawkeep did <b>not</b> call it "same": the check itself changed, not just names. It labelled it <b>unclear</b> and parked it for a person's yes. Being cautious here is the point.</div>
+<details class="uth"><summary>Mapping and evidence rules</summary><div class="in">
+<p><code>src/lawkeep/permissions.py</code>: <code>permission_key(action, direction)</code> maps: looser / <code>remove_law</code> / <code>skip_law</code> → <code>weaken_law</code>; <code>add_example</code> → <code>add_example</code>; stricter → <code>add_law</code>; same → <code>rename_target</code>; anything else → <code>change_law</code>. <code>decide(cfg, action, direction)</code> forces <code>weaken_law</code> to "ask" again even if a hand-built <code>Config</code> says otherwise (<code>config.FIXED_ASK</code>).</p>
+<p><code>src/lawkeep/direction.py</code>: <code>decide_direction(root, cfg, law_id, old_file, new_file)</code>. Rules:</p>
+<ul>
+  <li>Static weakening first (<code>static_weakening</code>, <code>is_skip_edit</code>): deletion, skip/xfail, lower <code>max_examples</code>, fewer <code>assert</code>s, added <code>assume()</code> → looser regardless of evidence.</li>
+  <li>Evidence: inputs from both versions' generators, the <code>@example</code>s of either, and saved failing inputs; then the same inputs against deliberately broken versions of the functions the law calls; then planted bugs via <code>strength.catch_matrix</code> (switch off with <code>LAWKEEP_DIRECTION_PLANTED_BUGS=0</code>).</li>
+  <li>new rejects a superset → stricter; same set and at least one rejection → candidate "same"; new accepts cases old rejected → looser; mixed or nothing comparable → unclear.</li>
+  <li>"same" also needs <code>rename_only(...)</code>: a consistent one-to-one renaming of names (two old names may not become one), identical attribute/keyword names and decorators, no renamed built-ins, and a renamed outside function must no longer exist under its old name. Any other edit with equal results is unclear.</li>
+  <li>A change to input generators or settings is never stricter or same on its own (<code>generators_changed</code>): it asks.</li>
+  <li>A moved limit is read from the code (<code>bound_direction</code>): when the only change is one comparison in an assert (<code>x &lt;= b</code> → <code>x &lt;= b + c</code>, <code>b - c</code>, a changed number, <code>&lt;</code> ↔ <code>&lt;=</code>, <code>==</code> → <code>&lt;=</code>/<code>&gt;=</code>, with <code>c</code> a number literal such as <code>Decimal("0.05")</code>), the old and new accepted values are compared as intervals: wider → looser (always), narrower → stricter (when no tried input contradicts it). Multiplication, <code>not</code>, <code>if</code>, <code>try</code>/<code>with</code> around the assert, or two changed comparisons go to the evidence.</li>
+  <li>The evidence is deterministic: Hypothesis draws from a seed made from the law id and both versions' source hashes, always 100 inputs, no example database, <code>PYTHONHASHSEED=0</code>, so the same change always gets the same label.</li>
+</ul>
+<p>All of this is evidence from samples plus code rules, not proof. The reports say so.</p>
+</div></details>
+
+<h3 id="idea-history">2.5 Law history, fingerprints and the lock</h3>
+<p>lawkeep keeps two records:</p>
+<ul>
+  <li><b><code>laws/history.jsonl</code></b>, the law history: one line per law change, in order. It says what changed, which agent did it, why, which permission allowed it, and who said yes. It is <b>append-only</b>: lines are added, never edited or removed.</li>
+  <li><b><code>laws.lock</code></b>, the lock file: a <b>fingerprint</b> of every law file. A fingerprint (a SHA-256 hash) is a short code computed from a file's exact bytes. Change one character and the fingerprint changes completely. Think of it as a tamper seal on a jar.</li>
+</ul>
+<p>If a law file's fingerprint no longer matches the lock, and the history does not explain the change, someone edited it without going through lawkeep. That is an <b>unrecorded law change</b>, and lawkeep flags it loudly.</p>
+<p>What counts as "part of the laws": everything in <code>laws/</code> (including <code>laws/strategies.py</code> and <code>laws/conftest.py</code>), plus <code>lawkeep.toml</code> and <code>.github/workflows/lawkeep.yml</code>. Why the settings too? Because "try 1 input instead of 200" in <code>lawkeep.toml</code> weakens every law at once.</p>
+<p>Lawkeep also watches for <b>side doors</b>: files that could change test results without touching a law, such as a <code>conftest.py</code> outside <code>laws/</code> (pytest loads it automatically), <code>sitecustomize.py</code> (Python runs it at start-up), <code>.pth</code> files, stale compiled <code>.pyc</code> files, and skip markers.</p>
+<div class="box example"><span class="t">Example (verified)</span>
+In a copy of the billing example, editing <code>laws/refunds.py</code> by hand (adding <code>+ 1</code> to the limit) made <code>lawkeep check</code> say <b>WAITING FOR YOUR DECISION</b> (result code 2), "laws/refunds.py was edited directly, without lawkeep (an unrecorded law change)", naming the affected law and saying how to fix it: put the file back with git, or a person runs <code>lawkeep approve --accept-unrecorded</code>.</div>
+
+<h3 id="idea-gate">2.6 The gate and result codes</h3>
+<p>The <b>gate</b> is <code>lawkeep check</code>. It runs every approved law and gives one verdict. Every lawkeep command ends with a <b>result code</b> (also called an exit code): a number a program returns to whoever started it. Scripts, CI and agents read this number.</p>
+<div class="tablewrap"><table>
+<tr><th>Code</th><th>Verdict</th><th>Meaning</th></tr>
+<tr><td><span class="pill p0">0</span></td><td>ALL LAWS HOLD</td><td>every law held (for other commands: done)</td></tr>
+<tr><td><span class="pill p1">1</span></td><td>SOME LAWS FAIL</td><td>at least one law broke, or could not run</td></tr>
+<tr><td><span class="pill p2">2</span></td><td>WAITING FOR YOUR DECISION</td><td>a person must decide something: an unrecorded change, a side door, a waiting proposal</td></tr>
+<tr><td><span class="pill p3">3</span></td><td>SETUP PROBLEM</td><td>lawkeep could not run: no project, bad settings, missing tool, crash</td></tr>
+</table></div>
+<p>When several apply, the most important wins: <b>3 &gt; 1 &gt; 2 &gt; 0</b>. A setup problem hides everything. Failing laws must be fixed before a pending decision matters.</p>
+<p>A <b>profile</b> is a set of gate settings. <code>pr</code> (the default) tries up to 200 inputs per law with a fixed seed, so the same code always gets the same verdict. <code>deep</code> tries 2,000 new random inputs each run, for nightly searches.</p>
+<div class="box warn"><span class="t">Watch out</span>argparse normally exits with 2 on bad command-line usage. In lawkeep, 2 means "waiting", so <code>cli.py</code> overrides it: usage errors exit with 3.</div>
+<p>Every command also takes <code>--json</code>: then it prints exactly one JSON document and nothing else on standard output. That is what agents and scripts read.</p>
+
+<h3 id="idea-strength">2.7 Law strength</h3>
+<p>A green gate only means "the code matches the laws". What if a law checks almost nothing? lawkeep grades the laws themselves:</p>
+<ul>
+  <li><b>Quick check with deliberately broken versions.</b> lawkeep temporarily swaps each function a law calls for dumb versions: "always returns None", "always returns 0", "returns its first argument unchanged", "always raises an error". A good law should break on each of them. If it still passes, it is weak.</li>
+  <li><b>Planted bugs</b> (also called <em>mutation testing</em>; each changed copy is a <em>mutant</em>). lawkeep makes small changes to a copy of your code, one at a time: <code>&lt;</code> becomes <code>&lt;=</code>, <code>+</code> becomes <code>-</code>, a line is deleted, a function returns None. Then it checks whether any law notices.</li>
+  <li><b>Weak test data.</b> If most generated inputs are thrown away (for example by <code>assume()</code>), the law checks far fewer cases than it seems.</li>
+  <li><b>Coverage</b>: which functions each law actually runs, measured with coverage.py. Public functions no law touches are listed as gaps.</li>
+</ul>
+<p>Two words lawkeep uses for weak laws:</p>
+<ul>
+  <li><b>One-sided</b>: the law checks a limit ("never more than"), not the right answer. "A refund never exceeds the payment" is one-sided: code that refuses every refund passes it.</li>
+  <li><b>Vacuous</b> (internally; the screen says "does not really check"): the law holds whatever the function does.</li>
+</ul>
+<p>The fix for one-sided laws is a <b>companion law</b> that pins down the exact answer: "Refunding exactly what was paid gives back exactly the payment and the whole card fee". When another approved law catches every broken version a limit law lets through, lawkeep gives <b>companion credit</b>: the limit law is shown as "Fairly strong", with a note naming its companions, instead of being flagged. Drafts never count as companions, because the gate does not run them.</p>
+<div class="box example"><span class="t">Example (verified)</span>
+<code>lawkeep strength</code> on the billing example says "NO WEAK LAWS FOUND". Four laws are "Strong". The two limit laws ("A refund never exceeds the original payment", and the discount bounds law) are "Fairly strong ... other laws catch what it lets through". Both examples now have 6 laws and no weak laws.</div>
+
+<h3 id="idea-protect">2.8 The protection report</h3>
+<p>This is the headline feature. On a change (a pull request, or an agent session), lawkeep:</p>
+<ol>
+  <li>asks git which lines changed since a base (for example <code>main</code>);</li>
+  <li>maps those lines to the functions they are in;</li>
+  <li>plants bugs only in those functions;</li>
+  <li>runs the laws and labels each function <b>Protected</b> (every planted bug caught), <b>Partly protected</b>, or <b>Not protected, read this one</b>.</li>
+</ol>
+<div class="box example"><span class="t">Example (verified)</span>
+The example's <code>unprotected_change.patch</code> adds <code>refund_v2()</code>, a new refund function with a real bug, but no law tests it. <code>lawkeep check</code> still says ALL LAWS HOLD (the laws only test <code>refund()</code>). <code>lawkeep report --base HEAD</code> says "SOME CHANGED CODE IS NOT PROTECTED": <code>refund_v2()</code>, "Not protected — read this one", "your laws caught none of 6 planted bugs · no law runs this function". That function is exactly what a human should read.</div>
+
+<h3 id="idea-ladder">2.9 The guarantee ladder</h3>
+<p>Each law is checked by the strongest method that fits, and the report names the level:</p>
+<div class="tablewrap"><table>
+<tr><th>Level</th><th>Method</th><th>Tool</th><th>In v0.1?</th></tr>
+<tr><td>L1</td><td>fixed examples only</td><td>pytest</td><td>yes</td></tr>
+<tr><td>L2</td><td>many generated inputs with shrinking</td><td>Hypothesis</td><td>yes (the normal case)</td></tr>
+<tr><td>L3</td><td>symbolic search with a solver</td><td>CrossHair</td><td>experimental (<code>check --deep-check</code>, needs <code>lawkeep[deep]</code>; not tried while writing this guide)</td></tr>
+<tr><td>L4</td><td>machine-checked proof</td><td>Dafny</td><td>no (v0.5). The only level allowed to say "proven".</td></tr>
+</table></div>
+</section>
+
+<!-- ============================================================ 3 -->
+<section id="day">
+<h2>3. A day in the life</h2>
+<p>Here is the whole flow, from setup to the end of a coding session. Each step shows what the person sees and what happens inside. A non-technical person can do all of this by talking to their coding agent; the agent runs the same commands.</p>
+
+<ol class="flow">
+<li><b>Set up: <code>lawkeep init</code></b><br>
+<em>You see:</em> "LAWKEEP IS SET UP", the files created, which agents were set up, and the next step.<br>
+<em>Inside:</em> lawkeep writes <code>lawkeep.toml</code> and the <code>laws/</code> folder, records an <code>init</code> line in the history, writes the first <code>laws.lock</code>, and installs the instructions and hooks for your coding agent.</li>
+
+<li><b>Ask for laws: <code>lawkeep draft billing.refunds --request "refunds can never exceed the payment"</code></b><br>
+<em>You see:</em> each draft as a box: the sentence, "works with your current code", "strong law" or a yellow "weak law" warning, and an example table.<br>
+<em>Inside:</em> lawkeep builds a prompt (your request, your docs, the module's function signatures), starts a fresh session of your coding agent, and lets it write files into <code>laws/drafts/</code>. Then it runs each draft on today's code and quick-checks it. Result code 2: drafts are waiting.</li>
+
+<li><b>Decide: <code>lawkeep approve</code></b><br>
+<em>You see:</em> each draft with its examples and a recommendation, then "Approve this law? [y/N]".<br>
+<em>Inside:</em> on yes, the draft file moves from <code>laws/drafts/</code> into <code>laws/</code>, and lawkeep records an <code>add_law</code> history line with your name and refreshes <code>laws.lock</code>. On no, the draft is removed and the rejection recorded.</li>
+
+<li><b>Code: the agent changes <code>refunds.py</code></b><br>
+<em>Inside:</em> if the agent tries to edit <code>laws/</code> directly, its pre-tool-use hook asks lawkeep, and lawkeep's guard says "deny: use <code>lawkeep propose</code>". (Only where the agent supports hooks; anything missed still shows up as an unrecorded change later.)</li>
+
+<li><b>Check: <code>lawkeep check</code></b><br>
+<em>You see:</em> ALL LAWS HOLD, or SOME LAWS FAIL with "the input that breaks it" and "why it failed" for each failing law.<br>
+<em>Inside:</em> integrity check first (no code runs), then all laws in a clean, isolated Python process, then new failing inputs are saved. The agent fixes the code and checks again.</li>
+
+<li><b>If a law seems wrong: <code>lawkeep propose</code></b><br>
+<em>Inside:</em> the agent writes a new version of the law file under <code>laws/drafts/</code> and proposes it with a reason. lawkeep decides the direction by evidence. Stricter: applied (if allowed). Looser or unclear: parked under <code>laws/drafts/proposals/&lt;id&gt;/</code>, waiting for a person (result code 2). Stopping to ask is a normal, successful outcome.</li>
+
+<li><b>End of session: <code>lawkeep report</code></b><br>
+<em>You see:</em> which changed functions are protected and which you must read, every law change since the session started, anything waiting for you, and anything changed outside lawkeep.<br>
+<em>Inside:</em> the session start time was recorded by the agent's session-start hook in <code>.lawkeep/session.json</code>.</li>
+
+<li><b>Pull request: the GitHub Action</b><br>
+<em>Inside:</em> on a fresh checkout it runs <code>check --json</code> and <code>report --format markdown</code>, then posts or updates one comment. It does not block merging unless you opt in.</li>
+</ol>
+</section>
+
+<section id="longruns">
+<h2>3b. Long runs without a person</h2>
+<p>Sometimes nobody is watching the coding agent: you start a big task in the evening and read the result in the morning, or the agent runs in CI. Two rules keep that safe and useful.</p>
+
+<h3>Park and keep going (what the agent does)</h3>
+<p>When a law blocks the agent and nobody is there to ask, the agent:</p>
+<ol>
+  <li><b>parks</b> the law change it needs: it writes the new version under <code>laws/drafts/</code> and runs <code>lawkeep propose ... --reason "why"</code>. A change that weakens a law (or that lawkeep cannot judge) waits for you. lawkeep answers "Parked as h-…: continue with work that does not depend on this law; list h-… in your final summary".</li>
+  <li><b>never works around the law</b>: it does not edit <code>laws/</code>, does not special-case the failing input, and never runs <code>lawkeep approve</code>.</li>
+  <li><b>keeps going</b> with every part of the task that does not depend on the blocked law.</li>
+  <li><b>ends with a summary</b> in three lists: done; waiting for you (with the ids); not done because a law blocked it.</li>
+</ol>
+<p>When you <i>are</i> there, nothing changes: the agent stops and asks you, which is a successful outcome.</p>
+
+<h3>One waiting list (what you do)</h3>
+<p>In the morning, everything that piled up is in one place: run <code>lawkeep approve</code>. It shows one list, grouped and counted, each kind with a plain explanation and what lawkeep suggests:</p>
+<ul>
+  <li><b>new drafts</b>: laws an agent wrote; not checked until you approve them;</li>
+  <li><b>proposed law changes</b>: looser, unclear, a deletion or a skip; they need your yes;</li>
+  <li><b>changes by the drafting AI</b>: files it changed although it was asked to write drafts only (the approved versions are still in place);</li>
+  <li><b>law changes made outside lawkeep</b>: law files someone edited directly;</li>
+  <li><b>approvals made without a terminal</b>: an agent recorded someone's yes from its own permission prompt; you <b>confirm</b> (you did say yes) or <b>undo</b> (the law files go back to how they were; recorded).</li>
+</ul>
+<p>You decide one by one. When at least two items are safe, lawkeep offers "approve all recommended new drafts and stricter changes". That batch never includes anything looser or unclear, any change by the drafting AI, any change made outside lawkeep, or any unconfirmed approval: you see each of those on its own.</p>
+<p>You also see the count in other places: "3 things wait for your decision (…) — run <code>lawkeep approve</code>" at the start of an agent session, at the end of <code>lawkeep check</code>, in <code>lawkeep report</code> and in the pull-request comment.</p>
+
+<div class="box"><span class="t">An overnight example</span>
+<p>At 22:00 you ask your agent: "Add bulk refunds, a refund history page, and let refunds of tiny amounts skip the fee." The tea-shop law "the fee is always 2%" blocks the last part.</p>
+<ul>
+  <li>The agent builds bulk refunds and the history page; <code>lawkeep check</code> says ALL LAWS HOLD for them.</li>
+  <li>For the fee, it proposes "the fee is 2%, or $0 under $1" with the reason "you asked for no fee on tiny refunds". lawkeep labels it <b>looser</b> and parks it as <code>h-3f9a1c2b</code>. The agent does not touch the fee code.</li>
+  <li>Its final message: <i>Done</i>: bulk refunds, refund history page. <i>Waiting for you</i>: h-3f9a1c2b (fee law change for tiny refunds). <i>Not done because blocked</i>: no fee on tiny refunds (needs h-3f9a1c2b).</li>
+  <li>At 08:00 you run <code>lawkeep approve</code>: "1 thing waits for your decision". You read the change and its examples and say yes (or no). Then you ask the agent to finish the fee part.</li>
+</ul></div>
+
+<details class="uth"><summary>Under the hood</summary><div class="in">
+<ul>
+  <li><b>Is a person there?</b> <code>presence.detect</code> makes a documented guess, reported as <code>person_present</code> (plus <code>person_present_reason</code>) in <code>check --json</code>, <code>report --json</code>, <code>approve --json</code> and the session-start hook. First match wins: <code>LAWKEEP_PERSON_PRESENT=1/0</code>; <code>CI</code> set → no; standard input is a terminal → yes; Claude Code's <code>CLAUDE_CODE_SESSION_ATTENDED</code> (1/0), else <code>CLAUDE_CODE_ENTRYPOINT</code> <code>cli</code> → yes, <code>sdk-*</code> (<code>claude -p</code>) → no; otherwise no. The Claude Code variables were seen in version 2.1; they are not a documented contract. Codex, Cursor and Copilot set nothing lawkeep knows, so an interactive session of theirs reads as "no"; the instructions say a person chatting with the agent counts as present. The guess never changes what lawkeep allows: weakening still needs a person's yes.</li>
+  <li><b>Where the rules live:</b> the AGENTS.md snippet ("When no person is there"), the session-start reminder (<code>hook.REMINDER</code> + <code>hook.NO_PERSON</code>), the MCP server instructions and the <code>propose</code> tool description, Cursor's rule and Copilot's instructions (both from the snippet), and the draft prompt (the drafting agent is always alone).</li>
+  <li><b><code>propose</code> without a person:</b> <code>ProposalResult.next_step</code> is "Parked as h-…. Continue with work that does not depend on this law; list h-… in your final summary …"; <code>person_present</code> is set. Exit code 2 still means "waiting for a person's decision".</li>
+  <li><b>The count:</b> <code>waiting.collect(root)</code> is static (no project code runs) and never raises. It is the additive JSON field <code>waiting_for_person</code> {<code>count</code>, <code>ids</code>, <code>by_kind</code>, <code>items</code>}; it is not called <code>waiting</code> because <code>check</code>'s <code>waiting</code> already means pending proposals. It never changes a result code.</li>
+  <li><b>The batch:</b> <code>approve._is_batch_safe</code> takes a draft only when every law in it works on today's code, is measured strong and is not a likely duplicate, and a proposal only when it is stricter or same-meaning and is not a deletion, a skip, a weak new law or a drafting-agent edit.</li>
+  <li><b>Confirm and undo:</b> an approval recorded with <code>details.terminal: false</code> stays on the list until a person in a terminal confirms it (<code>confirm_approval</code> history line) or undoes it (<code>undo_approval</code>: the files go back; an undone draft returns to <code>laws/drafts/</code>). To undo safely, <code>approve</code> keeps the earlier bytes of the files such an approval changed in <code>laws/drafts/proposals/undo/&lt;id&gt;/</code>; a copy is used only when its fingerprint matches what the append-only history says, else lawkeep looks in git, else it refuses. Neither can be done without a terminal.</li>
+</ul>
+</div></details>
+</section>
+
+<!-- ============================================================ 4 -->
+<section id="commands">
+<h2>4. Every command</h2>
+<p>There are nine commands. Seven are for people and agents. Two (<code>hook</code>, <code>mcp</code>) are plumbing that agents and git call. Every command accepts <code>--json</code> and <code>--root PATH</code> (the project folder; by default lawkeep searches upward for <code>lawkeep.toml</code>, or uses <code>LAWKEEP_ROOT</code>).</p>
+
+<div class="tablewrap"><table>
+<tr><th>Command</th><th>Purpose</th><th>Who runs it</th><th>Result codes</th></tr>
+<tr><td><code>init</code></td><td>set up the project and agent adapters</td><td>person or agent, once</td><td>0 done · 2 laws changed outside lawkeep (nothing touched) · 3</td></tr>
+<tr><td><code>draft</code></td><td>a separate agent session drafts laws</td><td>person or agent</td><td>2 drafts waiting · 1 a draft fails today or is weak · 3 agent missing/failed/wrote nothing · 0 with <code>--dry-run</code></td></tr>
+<tr><td><code>approve</code></td><td>say yes or no to drafts and proposals</td><td>a person (or an agent after the person's yes)</td><td>0 decided · 2 still waiting · 1 could not apply · 3</td></tr>
+<tr><td><code>check</code></td><td>the gate</td><td>everyone, often</td><td>0 · 1 · 2 · 3</td></tr>
+<tr><td><code>strength</code></td><td>grade the laws</td><td>person, CI, agent</td><td>0 no law flagged · 1 some law weak or failing · 3</td></tr>
+<tr><td><code>propose</code></td><td>request a law change</td><td>agent</td><td>0 applied · 2 waiting · 1 rejected (new version broken) · 3</td></tr>
+<tr><td><code>report</code></td><td>law changes + protection report</td><td>person, agent at session end, CI</td><td>0 · 2 decision or integrity error · 3</td></tr>
+<tr><td><code>hook</code></td><td>entry point for agent and git hooks</td><td>agents, git</td><td>agent hooks always 0 · pre-commit 0 (1 only if blocking was switched on)</td></tr>
+<tr><td><code>mcp</code></td><td>MCP server for agents</td><td>agents</td><td>0 when the client disconnects · 3 if <code>mcp</code> is not installed</td></tr>
+</table></div>
+
+<h3 id="cmd-init">lawkeep init</h3>
+<p><b>Purpose:</b> make a project ready for lawkeep. Safe to run again: it only creates what is missing and never overwrites.</p>
+<p><b>Options:</b> <code>--agent claude-code|codex|cursor|copilot|all|other|none</code> (repeatable; default: agents whose folders are present, such as <code>.claude/</code> or <code>CLAUDE.md</code>), <code>--no-hooks</code>, <code>--ci</code> / <code>--no-ci</code> (the GitHub workflow; default only if <code>.github/</code> exists).</p>
+<details class="uth"><summary>Step by step (commands/init.py)</summary><div class="in">
+<ol>
+  <li>If laws changed outside lawkeep, or <code>laws.lock</code> was deleted while the history has entries, touch nothing and return 2.</li>
+  <li>Write <code>lawkeep.toml</code> (<code>config.render_default_toml</code>), <code>laws/</code>, <code>laws/drafts/</code>, <code>laws/strategies.py</code> (from <code>adapters/templates/strategies.py</code>), empty <code>laws/history.jsonl</code> and <code>laws/failing_examples.jsonl</code>.</li>
+  <li><code>history.record_change(action="init")</code>: first history line and first <code>laws.lock</code>.</li>
+  <li>Add <code>.lawkeep/</code> to <code>.gitignore</code>.</li>
+  <li>Shared base (<code>adapters/base.py</code>): the lawkeep section in <code>AGENTS.md</code> between <code>&lt;!-- lawkeep:begin --&gt;</code> markers, and the git pre-commit hook block.</li>
+  <li>Each chosen adapter's <code>install(root, hooks=...)</code>. For Claude Code (verified): <code>.claude/settings.json</code> hooks and permission rules, <code>.mcp.json</code>, and <code>@AGENTS.md</code> in <code>CLAUDE.md</code>.</li>
+  <li>With <code>--ci</code>: <code>.github/workflows/lawkeep.yml</code> from <code>adapters/templates/lawkeep-workflow.yml</code> (fingerprinted in <code>laws.lock</code>).</li>
+</ol>
+<p><b>Writes:</b> the files above. <b>Gotcha:</b> the lawkeep repository already has its own lawkeep setup (lawkeep checks itself, see section 6), so tests must run <code>init</code> in a <code>tmp_path</code> copy, never in the repository.</p>
+</div></details>
+
+<h3 id="cmd-draft">lawkeep draft</h3>
+<p><b>Purpose:</b> get draft laws written by a fresh, separate session of your own coding agent, from what you asked for. No extra account or API key is needed.</p>
+<p><b>Options:</b> <code>module</code> (for example <code>billing.refunds</code>), <code>--request TEXT</code>, <code>--docs PATH ...</code>, <code>--dry-run</code> (print the prompt, start nothing), <code>--timeout N</code>, <code>--actor agent:NAME</code>.</p>
+<details class="uth"><summary>Step by step (commands/draft.py, agent_launcher.py, examples_table.py)</summary><div class="in">
+<ol>
+  <li>Collect the request, the docs (size-capped) and the module's <b>public</b> function signatures and docstrings, read with <code>ast</code>. Function bodies are not sent, on purpose: laws should follow what the person wants, not what the code does today. Existing law sentences are listed so the agent does not duplicate them.</li>
+  <li>Snapshot <code>laws/</code>, then launch the agent once, non-interactively (<code>agent_launcher.launch</code>). The command comes from <code>[agent]</code> in <code>lawkeep.toml</code> or a preset (table below). The environment variable <code>LAWKEEP_DRAFTING=1</code> tells the guard this session may write <code>laws/strategies.py</code>.</li>
+  <li>Keep the agent to drafts (<code>_handle_law_file_changes</code>). New generators the agent <em>added</em> to <code>laws/strategies.py</code> are recorded as <code>add_strategy</code> (stricter) when <code>add_law = "auto"</code>, otherwise parked in <code>laws/drafts/strategies.py</code> until a draft is approved. Every other change to a file <code>laws.lock</code> fingerprints (an approved law, an existing generator, <code>lawkeep.toml</code>, a helper in <code>laws/</code>) is <b>not thrown away and not applied</b>: <code>draft_edits.capture_and_restore</code> keeps the old and new content and puts the approved version back (so <code>check</code> keeps testing the approved laws and nothing is unrecorded), then <code>draft_edits.make_proposals</code> turns each changed file into one <b>waiting proposal</b> (<code>propose.park_proposal</code>, <code>whole_file: true</code>, <code>from_draft: true</code>). The direction is judged as in <code>propose</code> (<code>direction.decide_direction</code> for each changed law); settings and generator changes are "unclear" with a list of what changed. These proposals never go in on their own, not even stricter ones: the person reviews each one with <code>lawkeep approve</code>. The reason is "edited by the drafting agent during <code>lawkeep draft</code>", plus the agent's own words when it wrote a <code>Changed &lt;path&gt;: &lt;why&gt;</code> line.</li>
+  <li>For each draft file: find its laws (<code>discovery.laws_in_file</code>), run the probe (<code>examples_table.probe_law</code>: does it import, does it hold today, example rows), and the quick strength check (<code>strength.run_quick_check(include_drafts=True)</code>).</li>
+  <li>Record who drafted what in <code>laws/drafts/drafts.json</code>.</li>
+</ol>
+<div class="tablewrap"><table>
+<tr><th>Agent</th><th>Preset launch command (from docs; never run for real)</th></tr>
+<tr><td>Claude Code</td><td><code>claude -p --permission-mode acceptEdits {prompt}</code></td></tr>
+<tr><td>Codex</td><td><code>codex exec --sandbox workspace-write {prompt}</code></td></tr>
+<tr><td>Cursor</td><td><code>cursor-agent -p --force {prompt}</code></td></tr>
+<tr><td>Copilot</td><td><code>copilot -p {prompt} --no-ask-user --allow-tool 'read, write(laws/drafts/*), write(laws/strategies.py)' --deny-tool 'shell, url'</code> (reads, and writes only drafts and <code>laws/strategies.py</code>; no shell commands or web access. Changed 2026-11-23 from <code>--allow-all-tools</code>, which allowed any shell command)</td></tr>
+</table></div>
+<p>A failing draft is shown as "either the code has a bug or the law is wrong: you decide". The agent's edits to approved files are listed under "The drafting AI also changed approved laws or settings — waiting for your review", each with the law before and after (or the changed settings / generators), the direction in plain words and its decision id; the result is 2. JSON: <code>data.waiting_changes</code>. The <code>--dry-run</code> output was verified while writing this guide; a real agent launch was not (the waiting-proposal flow is tested with a fake agent).</p>
+</div></details>
+
+<h3 id="cmd-approve">lawkeep approve</h3>
+<p><b>Purpose:</b> the only command that records a person's yes. With no ids it shows <b>one waiting list</b> of five kinds (new drafts, proposed law changes, changes by the drafting AI, law changes made outside lawkeep, approvals made without a terminal; see <a href="#longruns">3b</a>). In a terminal it asks about each item, offers "approve all recommended new drafts and stricter changes" when at least two are safe, and asks confirm / undo / skip for an approval made without a terminal. Without a terminal (or with <code>--json</code>) it decides nothing, lists what is waiting, and returns 2.</p>
+<p><b>Options:</b> <code>ID ...</code> (a law id, a decision id such as <code>h-b4a670cd</code>, or a draft file), <code>--yes</code> / <code>--no</code>, <code>--by NAME</code>, <code>--channel TEXT</code> (where the yes came from, e.g. "agent permission prompt"), <code>--accept-unrecorded</code>.</p>
+<div class="box warn"><span class="t">Guard rails (an agent could run this command itself)</span>
+<ul>
+  <li><code>--yes</code> without ids never decides a weakening proposal, or a change the drafting AI made to an approved file during <code>lawkeep draft</code>. Those are approved one at a time, by id.</li>
+  <li><code>--accept-unrecorded</code> without ids decides only the hand edits, with a static review of what got looser.</li>
+  <li>Without a terminal, <code>--yes</code> needs <code>--by</code> or <code>--channel</code>. The person is never taken from the git user name, and the entry records <code>terminal: false</code>. <code>check</code> and <code>report</code> then list it as an approval made without a terminal.</li>
+</ul></div>
+<details class="uth"><summary>Step by step (commands/approve.py)</summary><div class="in">
+<ol>
+  <li><code>collect</code>: drafts in <code>laws/drafts/</code>, pending proposals (<code>history.pending</code>: waiting entries no later entry <code>refers_to</code>), the lock diff (with no ids or <code>--accept-unrecorded</code>), and approvals made without a terminal (<code>approvals.unconfirmed_groups</code>).</li>
+  <li>Grade drafts: probe + quick check, plus a "likely duplicate" note when an approved sentence is almost the same (text similarity, not meaning).</li>
+  <li>Mark the items that may go in the batch (<code>_is_batch_safe</code>). Show the overview, then each item (<code>view</code>, built with <code>explain.draft_law_panel</code>) and ask (<code>_ask</code>, or <code>_choose</code> for confirm / undo / skip), or use <code>--yes</code>/<code>--no</code>. Changes made outside lawkeep are asked first, then the batch, then the rest.</li>
+  <li>Yes on a draft: move it into <code>laws/</code>, install parked generators, <code>history.record_change(action="add_law", approved_by=person, ...)</code>. Yes on a proposal: <code>propose.apply_proposal</code>, which refuses if the proposal file or the target file changed since the waiting entry recorded their hashes (for the drafting agent's edits it writes the whole file it wrote, byte for byte, or deletes it). No: remove and record <code>reject_draft</code> / a rejected entry with <code>refers_to</code>.</li>
+  <li>Closing screen (<code>_final_screen</code>).</li>
+</ol>
+<p>The interactive terminal flow is tested with the questions answered by the test (<code>tests/test_lifecycle_waiting_list.py</code>); it was not typed through by hand. The no-terminal path (result 2) was run.</p>
+</div></details>
+
+<h3 id="cmd-check">lawkeep check</h3>
+<p><b>Purpose:</b> the gate. Runs only the laws in <code>laws/</code>, never your normal test suite.</p>
+<p><b>Options:</b> <code>--profile NAME</code>, <code>--deep-check</code> (CrossHair, experimental), <code>--law LAW_ID</code> (repeatable; the result then says it was a partial run; an unknown id is a setup problem), <code>--base REF</code> (git base for side-door checks, default HEAD), <code>--no-save</code>, <code>--timeout SECONDS</code>, <code>--details</code>/<code>-v</code> (law ids, inputs tried, timings, every note).</p>
+<p><b>What the screen shows:</b> a verdict banner, a table of laws (sentence and Holds / Fails / Could not run / Skipped), one box per failing law with "the input that breaks it", "why it failed" in words (for example "The law expected 0.25, but the code gave 0.26."), what the inputs mean, then anything that needs a person's decision, notes, a footer (inputs per law, profile, time) and a "Next step" line. On the billing example a full run took about 2.5 seconds.</p>
+<details class="uth"><summary>Step by step (commands/check.py)</summary><div class="in">
+<pre><code>paths.require_root → config.load_config → integrity.check_integrity   <span class="c"># no code runs</span>
+→ runner.run_laws                       <span class="c"># isolated pytest process</span>
+→ ledger.add (new failures only, unless --no-save)
+→ lawchanges.list_pending               <span class="c"># waiting proposals</span>
+→ CheckReport(...).finalize()           <span class="c"># fails/error → 1; integrity errors or waiting → 2; else 0</span>
+→ output.emit(report, args.json, text=render(...))</code></pre>
+<p><b>Reads:</b> <code>lawkeep.toml</code>, <code>laws/</code>, <code>laws.lock</code>, history, ledger, git. <b>Writes:</b> only new lines appended to <code>laws/failing_examples.jsonl</code>. It never rewrites <code>laws.lock</code>. A skipped law counts as neither holding nor failing; a skip raised <em>while</em> a law runs is an error.</p>
+</div></details>
+
+<h3 id="cmd-strength">lawkeep strength</h3>
+<p><b>Purpose:</b> grade the laws (section 2.7). <b>Options:</b> <code>--full</code> (plant every bug in every function, slower), <code>--law ID</code>, <code>--drafts</code> (include drafts), <code>--details</code>.</p>
+<p><b>What the screen shows:</b> a banner (for example "NO WEAK LAWS FOUND"), a table: law sentence, Strong / Fairly strong / Weak, and what lawkeep found ("caught 4 of 4 deliberately broken versions; caught 3 of 3 planted bugs"), then suggestions for weak laws. Quick mode plants up to 3 bugs per function a law calls by name. On the billing example quick mode took about 4.5 seconds.</p>
+<details class="uth"><summary>Step by step (strength/core.py)</summary><div class="in">
+<ol>
+  <li><b>Map run</b>: every law runs once in an isolated worker process under coverage.py, one coverage <em>context</em> per law, with Hypothesis statistics on. Output: functions each law executes, lines it never reaches, inputs thrown away, holds today or not.</li>
+  <li><b>Probe run</b>: for each law that holds, swap each function it calls by name (up to 8) for the quick-check variants (<code>_worker.quick_variants</code>: always None, always 0, always an empty value, first argument unchanged, always raises) and plant bugs (<code>mutants.py</code>), re-running the law each time. A timeout counts as caught. A per-run time limit uses SIGALRM (POSIX only).</li>
+  <li>Flags: all variants missed → "Vacuous: ..."; some value variants missed → "One-sided: ..."; "raises" missed → "may catch the error itself". Weak test data when at least half of generated inputs were thrown away.</li>
+  <li><code>_credit_companions</code>: a one-sided flag is removed (and a note added) when other approved, non-vacuous laws catch every variant this law missed.</li>
+  <li>Uncovered public functions are listed.</li>
+</ol>
+<p>The quick check only swaps names the law calls; the law's own parameters and local variables are excluded (<code>_worker.law_source_names</code>). Before that fix, a parameter named <code>charge</code> made it swap the function <code>charge()</code>, a false "one-sided" flag. The user's files are never written: everything happens in memory in the worker.</p>
+</div></details>
+
+<h3 id="cmd-propose">lawkeep propose</h3>
+<p><b>Purpose:</b> the only legal way for an agent to change a law. <b>Usage:</b> <code>lawkeep propose LAW_ID --file laws/drafts/new.py --reason "why"</code>, or <code>lawkeep propose LAW_ID --delete --reason "why"</code>. <code>--actor agent:NAME</code> says who.</p>
+<details class="uth"><summary>Step by step (commands/propose.py)</summary><div class="in">
+<ol>
+  <li>Refuse while <code>laws.lock</code> shows an unrecorded change (decision <code>refused</code>; the proposed file is kept). Otherwise <code>history.record_change</code> would sweep the hand edit in.</li>
+  <li>Same text as today → <code>unchanged</code>, nothing recorded.</li>
+  <li><code>direction.decide_direction</code> (section 2.4). A new version that does not import → <code>rejected</code>, result 1.</li>
+  <li>A <b>new</b> law must also pass the quick strength check to go in automatically; otherwise it waits.</li>
+  <li><code>permissions.decide</code>. Auto: write the law, <code>record_change(status="applied")</code>, result 0. Ask: park under <code>laws/drafts/proposals/&lt;history id&gt;/</code> as <code>proposed.py.txt</code> (".txt" so neither the gate nor draft discovery collects it) plus <code>meta.json</code>, append a <code>waiting</code> entry with the hashes, result 2.</li>
+  <li>The <code>--file</code> under <code>laws/drafts/</code> is removed once recorded.</li>
+</ol>
+<p>Verified: the <code>+ 1</code> proposal above was parked as <code>change_law</code> / unclear with decision id <code>h-...</code>, and the screen said "WAITING FOR YOUR YES" with the exact approve commands.</p>
+</div></details>
+
+<h3 id="cmd-report">lawkeep report</h3>
+<p><b>Purpose:</b> one plain report for the end of a session or a pull request. <b>Options:</b> <code>--since ISO</code> / <code>--session</code> / <code>--all</code>, <code>--base REF</code>, <code>--no-protection</code>, <code>--format text|markdown</code> (markdown is what the Action posts).</p>
+<p><b>What the screen shows:</b> a banner, the protection table (function, Protected / Partly protected / Not protected — read this one, what lawkeep found), then the list of recorded law changes (what happened, which law, who, why, evidence), anything waiting, and integrity problems.</p>
+<details class="uth"><summary>Step by step (commands/report.py, protection.py, lawchanges.py)</summary><div class="in">
+<pre><code>since = --since | history.session_start(root) | everything
+→ lawchanges.changes_since + list_pending
+→ integrity.check_integrity
+→ protection.protection_report(base)      <span class="c"># git diff → changed functions → planted bugs</span>
+→ LawChangeReport; text from strength.render + lawchanges.render_since</code></pre>
+<p>The default base is the merge-base with <code>origin/main</code>, <code>main</code>, <code>origin/master</code> or <code>master</code>. The diff includes uncommitted and untracked files, so it works mid-session. Without git, every public function is checked. Up to 20 planted bugs per changed function. The protection part only shows: by itself it never changes the result code.</p>
+</div></details>
+
+<h3 id="cmd-hook">lawkeep hook</h3>
+<p><b>Purpose:</b> what agents and git call. You never run it by hand. A <b>hook</b> is a command a tool runs automatically at a certain moment: before the agent uses a tool, when a session starts, before git makes a commit.</p>
+<div class="tablewrap"><table>
+<tr><th>Event</th><th>What it does</th></tr>
+<tr><td><code>pre-tool-use</code> (alias <code>pre-edit</code>)</td><td>reads the agent's hook JSON on stdin and answers in the agent's own format: deny direct edits to the laws, "ask" for <code>lawkeep approve</code>, allow everything else</td></tr>
+<tr><td><code>session-start</code></td><td>writes <code>.lawkeep/session.json</code> and prints a reminder of the rules that the agent adds to its context, including what to do when nobody is there, lawkeep's guess whether a person is there, and the count of what waits for the person</td></tr>
+<tr><td><code>session-end</code></td><td>prints the law change report for the session, ending with the same count</td></tr>
+<tr><td><code>pre-commit</code></td><td>runs the integrity check (no project code runs) and shows problems; does not block unless <code>git config lawkeep.precommit block</code> or <code>LAWKEEP_PRECOMMIT=block</code></td></tr>
+</table></div>
+<div class="box warn"><span class="t">Why agent hooks always exit 0</span>To agents, exit code 2 means "block". To lawkeep, 2 means "waiting". So the hook always exits 0 and puts the decision inside its JSON output. A broken hook therefore never blocks the agent.</div>
+
+<h3 id="cmd-mcp">lawkeep mcp</h3>
+<p><b>Purpose:</b> an <b>MCP server</b>. MCP (Model Context Protocol) is a standard way for coding agents to call outside tools. <code>lawkeep mcp</code> offers four tools: <code>check</code>, <code>propose</code>, <code>report</code>, <code>list_laws</code>. There is deliberately <b>no approve tool</b>: a yes must come from a person.</p>
+<details class="uth"><summary>How it works (mcp_server.py)</summary><div class="in">
+<p>Needs the optional <code>mcp</code> package (<code>lawkeep[mcp]</code>), imported lazily; works with the SDK 2.x and 1.x APIs. <code>check</code>, <code>propose</code> and <code>report</code> run <code>python -m lawkeep &lt;command&gt; --json</code> in a fresh process and return that exact JSON, so the MCP path and the CLI path can never disagree. <code>list_laws</code> uses static discovery (no project code runs). Proposals over MCP are always recorded as <code>agent:&lt;name&gt;</code>. Config files fall back to <code>&lt;project&gt;/.venv/bin/lawkeep</code> when lawkeep is not on PATH.</p>
+</div></details>
+</section>
+
+<!-- ============================================================ 5 -->
+<section id="arch">
+<h2>5. Architecture</h2>
+<p>lawkeep is a coordinator. It does not test code itself. It wraps existing tools (pytest, Hypothesis, coverage.py, git, your coding agent) and adds what is missing around them: fingerprints, history, permissions, clean runs, strength checks and plain reports.</p>
+
+<h3 id="arch-diagram">5.1 The big picture</h3>
+<p>Three kinds of callers (a person, a coding agent, CI) all go through the same CLI. Commands call groups of core modules. Every command that runs laws (the gate, strength and the example tables) goes through one law-running core, <code>lawrun.py</code>, which starts an isolated Python process in one of three modes: <code>check</code>, <code>strength</code> or <code>probe</code>.</p>
+<div class="diagram" role="img" aria-label="Module diagram: callers go through cli.py to commands, which use foundation, gate, lifecycle, strength and adapter modules; one law-running core starts every isolated process, in three modes; files on disk at the bottom.">
+<svg viewBox="0 0 1000 760" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="svg-arrow"/></marker>
+  </defs>
+  <!-- callers -->
+  <text x="20" y="24" class="svg-h">CALLERS</text>
+  <rect x="20" y="34" width="200" height="54" rx="8" class="svg-box"/>
+  <text x="34" y="56" class="svg-t">Person (terminal)</text>
+  <text x="34" y="75" class="svg-s">lawkeep &lt;command&gt;</text>
+  <rect x="250" y="34" width="250" height="54" rx="8" class="svg-box"/>
+  <text x="264" y="56" class="svg-t">Coding agent</text>
+  <text x="264" y="75" class="svg-s">CLI · hooks · MCP · AGENTS.md</text>
+  <rect x="530" y="34" width="210" height="54" rx="8" class="svg-box"/>
+  <text x="544" y="56" class="svg-t">CI / pull request</text>
+  <text x="544" y="75" class="svg-s">action.yml</text>
+  <rect x="770" y="34" width="210" height="54" rx="8" class="svg-box"/>
+  <text x="784" y="56" class="svg-t">git commit</text>
+  <text x="784" y="75" class="svg-s">.git/hooks/pre-commit</text>
+  <!-- arrows to cli -->
+  <path d="M120 88 V118 H480" class="svg-line"/>
+  <path d="M375 88 V118" class="svg-line"/>
+  <path d="M635 88 V118 H520" class="svg-line"/>
+  <path d="M875 88 V118 H520" class="svg-line"/>
+  <path d="M500 118 V134" class="svg-line" marker-end="url(#ar)"/>
+  <!-- cli -->
+  <rect x="300" y="136" width="400" height="50" rx="8" class="svg-box"/>
+  <text x="314" y="157" class="svg-t">cli.py → commands/&lt;name&gt;.py</text>
+  <text x="314" y="175" class="svg-s">init draft approve check strength propose report hook mcp</text>
+  <path d="M500 186 V214" class="svg-line" marker-end="url(#ar)"/>
+  <!-- groups -->
+  <rect x="20" y="216" width="300" height="190" rx="10" class="gg group-stroke"/>
+  <text x="34" y="238" class="svg-h">GATE</text>
+  <text x="34" y="262" class="svg-s">integrity.py   (no code runs)</text>
+  <text x="34" y="282" class="svg-s">runner.py → lawrun.py (mode check)</text>
+  <text x="34" y="302" class="svg-s">pytest_plugin.py (in child)</text>
+  <text x="34" y="322" class="svg-s">ledger.py   (saved failures)</text>
+  <text x="34" y="352" class="svg-t">check</text>
+
+  <rect x="350" y="216" width="300" height="190" rx="10" class="gl group-stroke"/>
+  <text x="364" y="238" class="svg-h">LAW LIFECYCLE</text>
+  <text x="364" y="262" class="svg-s">agent_launcher.py</text>
+  <text x="364" y="282" class="svg-s">examples_table.py → lawrun (probe)</text>
+  <text x="364" y="302" class="svg-s">direction.py · permissions.py</text>
+  <text x="364" y="322" class="svg-s">lawchanges.py</text>
+  <text x="364" y="352" class="svg-t">draft · approve · propose</text>
+
+  <rect x="680" y="216" width="300" height="190" rx="10" class="gs group-stroke"/>
+  <text x="694" y="238" class="svg-h">STRENGTH &amp; PROTECTION</text>
+  <text x="694" y="262" class="svg-s">strength/core.py</text>
+  <text x="694" y="282" class="svg-s">core.run_worker → lawrun (strength)</text>
+  <text x="694" y="302" class="svg-s">mutants.py · sourcemap.py</text>
+  <text x="694" y="322" class="svg-s">protection.py (git diff)</text>
+  <text x="694" y="352" class="svg-t">strength · report</text>
+
+  <!-- lifecycle uses strength -->
+  <path d="M650 300 H678" class="svg-dash" marker-end="url(#ar)"/>
+  <text x="604" y="392" class="svg-s">planted bugs</text>
+
+  <!-- adapters -->
+  <rect x="20" y="420" width="470" height="92" rx="10" class="ga group-stroke"/>
+  <text x="34" y="442" class="svg-h">AGENT ADAPTERS</text>
+  <text x="34" y="466" class="svg-s">adapters/guard.py · base.py · claude_code / codex /</text>
+  <text x="34" y="484" class="svg-s">cursor / copilot.py · templates/ · mcp_server.py</text>
+  <text x="34" y="502" class="svg-t">init · hook · mcp</text>
+
+  <rect x="510" y="420" width="470" height="92" rx="10" class="gf group-stroke"/>
+  <text x="524" y="442" class="svg-h">FOUNDATION (used by everything)</text>
+  <text x="524" y="466" class="svg-s">config paths models discovery lock history</text>
+  <text x="524" y="484" class="svg-s">output ui explain readable errors exitcodes _law st</text>
+  <text x="524" y="502" class="svg-s">history.record_change = the only writer of laws.lock</text>
+
+  <!-- isolated processes -->
+  <text x="20" y="548" class="svg-h">ONE LAW-RUNNING CORE: lawrun.py → python -I -S -B _boot.py lawkeep._lawrun_child</text>
+  <rect x="20" y="558" width="300" height="62" rx="8" class="svg-box"/>
+  <text x="34" y="580" class="svg-t">mode check</text>
+  <text x="34" y="600" class="svg-s">pytest + Hypothesis + gate plugin</text>
+  <rect x="350" y="558" width="300" height="62" rx="8" class="svg-box"/>
+  <text x="364" y="580" class="svg-t">mode probe</text>
+  <text x="364" y="600" class="svg-s">_probe_worker: Hypothesis + recorder</text>
+  <rect x="680" y="558" width="300" height="62" rx="8" class="svg-box"/>
+  <text x="694" y="580" class="svg-t">mode strength</text>
+  <text x="694" y="600" class="svg-s">_worker: pytest + coverage.py + swaps</text>
+  <path d="M170 406 V556" class="svg-line" marker-end="url(#ar)"/>
+  <path d="M500 406 V418" class="svg-line"/>
+  <path d="M500 512 V556" class="svg-line" marker-end="url(#ar)"/>
+  <path d="M830 406 V418" class="svg-line"/>
+  <path d="M830 512 V556" class="svg-line" marker-end="url(#ar)"/>
+  <text x="178" y="536" class="svg-s">request on stdin · results pipe</text>
+
+  <!-- disk -->
+  <rect x="20" y="650" width="960" height="92" rx="10" class="gd group-stroke"/>
+  <text x="34" y="672" class="svg-h">FILES ON DISK (the user's project)</text>
+  <text x="34" y="698" class="svg-s">lawkeep.toml · laws/*.py · laws/strategies.py · laws.lock · laws/history.jsonl · laws/failing_examples.jsonl</text>
+  <text x="34" y="720" class="svg-s">laws/drafts/ (drafts, proposals/) · .lawkeep/session.json · your source code (src/)</text>
+  <path d="M170 620 V648" class="svg-dash" marker-end="url(#ar)"/>
+  <path d="M500 620 V648" class="svg-dash" marker-end="url(#ar)"/>
+  <path d="M830 620 V648" class="svg-dash" marker-end="url(#ar)"/>
+</svg>
+</div>
+<p>Groups follow the original build workstreams in <code>docs/ARCHITECTURE.md</code> §2: A Foundation, B Gate, C Strength &amp; protection, D Law lifecycle, E Adapters, F CI &amp; proof. Test file prefixes follow the same split.</p>
+
+<h3 id="arch-cli">5.2 CLI and output</h3>
+<p><b>What and why:</b> one small entry point finds every command, and every command talks to people in the same plain style. Commands are independent: a command that fails to import breaks only itself.</p>
+<div class="tablewrap"><table class="facts">
+<tr><th>Files</th><td><code>cli.py</code>, <code>commands/*.py</code>, <code>output.py</code>, <code>ui.py</code>, <code>explain.py</code>, <code>readable.py</code>, <code>errors.py</code>, <code>exitcodes.py</code>, <code>docs/OUTPUT-STYLE.md</code></td></tr>
+<tr><th>How</th><td><code>cli.COMMANDS</code> lists the nine names. Each module exposes <code>HELP</code>, <code>add_arguments(parser)</code>, <code>run(args) -&gt; int</code>. <code>cli.py</code> adds <code>--json</code> and <code>--root</code>. <code>SetupError</code> (or any crash) becomes a plain message and code 3; <code>LAWKEEP_DEBUG=1</code> shows the traceback.</td></tr>
+<tr><th>Output</th><td>Human screens are built with <code>ui</code> (Rich: colour and rounded boxes in a terminal; plain ASCII when not a terminal, with <code>CI</code>, <code>NO_COLOR</code> or <code>TERM=dumb</code>; <code>LAWKEEP_COLOR=always</code> forces colour) and the shared sentences in <code>explain</code> ("works with your current code", strong/weak, example tables, recommendations). JSON never goes through Rich: <code>output.emit(report, as_json, text=...)</code>.</td></tr>
+<tr><th>Gotchas</th><td>Never edit <code>cli.py</code> to add arguments. Never prompt in <code>--json</code> mode or without a terminal: return 2. Keep the JSON schema stable: agents parse it. Text wraps to the terminal width (80 when not a terminal), so tests that search long phrases set <code>COLUMNS=200</code>.</td></tr>
+</table></div>
+<details class="uth"><summary>The output style rules</summary><div class="in">
+<p><code>docs/OUTPUT-STYLE.md</code> is binding for any message, error or <code>--help</code> text. In short: lead with the verdict; give every number its meaning ("lawkeep tried 46 different inputs and the law was never broken", not "46 examples"); avoid internal words ("vacuous", "mutant", "probe", "nodeid") on screen; ids and paths dim or behind <code>--details</code>; the law sentence is always the primary name; always end with "Next step:"; flag weak laws loudly; say failures in words; never "proven" or "guaranteed" below L4. The glossary there fixes the words to use ("deliberately broken versions", "one-sided", "unrecorded change"...).</p>
+</div></details>
+
+<h3 id="arch-foundation">5.3 Foundation</h3>
+<p><b>What and why:</b> shared building blocks with no surprises: reading settings, finding the project, describing laws without running them, and one set of data shapes for every report.</p>
+<div class="tablewrap"><table class="facts">
+<tr><th><code>config.py</code></th><td><code>load_config(root) -&gt; Config</code>. Missing file → defaults. Invalid values → <code>ConfigError</code> (code 3). Unknown keys → warnings with a "did you mean" hint. <code>weaken_law = "auto"</code> → forced to "ask" plus a warning. Holds <code>AGENT_PRESETS</code>.</td></tr>
+<tr><th><code>paths.py</code></th><td>Project root = nearest folder upward with <code>lawkeep.toml</code>, else with <code>laws/</code>. <code>require_root</code> raises <code>ProjectNotFound</code>. <code>rel()</code>: paths in data are relative, with forward slashes.</td></tr>
+<tr><th><code>discovery.py</code></th><td>Finds laws by <b>reading</b> files with <code>ast</code>, never running them: sentence, id, line, source hash. Recognises aliases (<code>import lawkeep as lk</code>). Reports problems (non-literal sentence, duplicate ids). <code>describe_inputs</code> reads <code>@law(inputs=...)</code>.</td></tr>
+<tr><th><code>models.py</code></th><td>Dataclasses for every report and record (<code>CheckReport</code>, <code>LawResult</code>, <code>IntegrityIssue</code>, <code>HistoryEntry</code>, <code>StrengthResult</code>, <code>ProtectionResult</code>, <code>ProposalResult</code>, <code>SimpleReport</code>...). Invalid choice values raise at construction. <code>to_dict()</code>/<code>from_dict()</code>. Timestamps: UTC ISO 8601 with microseconds and <code>Z</code>.</td></tr>
+<tr><th>Gotcha</th><td><code>discovery.py</code>, <code>lock.py</code> and <code>integrity.py</code> must <b>never</b> import or run project code. That is what makes the integrity check safe to run first.</td></tr>
+</table></div>
+
+<h3 id="arch-history">5.4 Lock and history</h3>
+<p><b>What and why:</b> the memory of every law change, and the tamper seal. Without them lawkeep could not tell a recorded change from a silent one.</p>
+<div class="tablewrap"><table class="facts">
+<tr><th>Files</th><td><code>lock.py</code>, <code>history.py</code></td></tr>
+<tr><th>Reads/writes</th><td><code>laws.lock</code> (TOML), <code>laws/history.jsonl</code></td></tr>
+<tr><th>The one rule</th><td><code>history.record_change(root, *, action, actor, ...)</code> is <b>the only way to change laws</b>. Make the change on disk first, then call it. For <code>applied</code> entries it stores every changed fingerprinted file's new hash (or null) in <code>entry.files</code>, appends the entry, and rewrites <code>laws.lock</code>. For <code>waiting</code>/<code>rejected</code> it only appends. Nothing else calls <code>lock.write_lock</code> in production code.</td></tr>
+<tr><th>Fingerprinted</th><td>Every file under <code>laws/</code> except <code>laws/drafts/</code>, the two append-only files and caches; plus <code>lawkeep.toml</code> and <code>.github/workflows/lawkeep.yml</code>. The append-only files get a line count and a hash of exactly those lines instead.</td></tr>
+<tr><th>Gotchas</th><td><code>record_change</code> sweeps in <em>every</em> difference from the lock, including earlier hand edits. Always check <code>lock.diff_against_lock(root).is_empty</code> first, and stop if it is not. It also refuses to record anything while an append-only file has lost lines.</td></tr>
+</table></div>
+
+<h3 id="arch-gate">5.5 The gate</h3>
+<p><b>What and why:</b> run every law in a clean room and return one verdict. "Clean room" matters: an agent cannot help the laws pass by placing a helper file next to them, because lawkeep's run ignores those files.</p>
+<p><b>How, in plain words:</b> first lawkeep checks the seals (no code runs). Then it starts a brand-new Python process with strict settings, runs only the law files, and gets the results back through a private one-way channel. Finally it saves new failures and builds the report.</p>
+<details class="uth"><summary>Process isolation, exactly (the law-running core)</summary><div class="in">
+<p>Every law-running process in lawkeep is started by one function, <code>lawrun.run(root, cfg, mode, request, ...)</code>, in one of three modes: <code>check</code> (this gate), <code>strength</code> (5.7) and <code>probe</code> (example tables, 5.6). The gate's <code>runner.run_pytest</code> calls it with mode <code>check</code>. The command is the same for every mode:</p>
+<pre><code>python -I -S -B -X pycache_prefix=&lt;empty temp dir&gt; _boot.py &lt;site dirs JSON&gt; lawkeep._lawrun_child
+# request on stdin (JSON), for check mode including:
+#   pytest_args: -c &lt;empty ini&gt; --rootdir=&lt;root&gt; --noconftest --import-mode=importlib \
+#     --continue-on-collection-errors -p no:cacheprovider -q \
+#     -p _hypothesis_pytestplugin -p lawkeep.pytest_plugin --tb=short laws/&lt;law files&gt;
+#   gate: {profile, law_ids, ledger}   results_fd: &lt;pipe number&gt;</code></pre>
+<p>The child (<code>_lawrun_child.py</code>) reads the request, points stdin at <code>/dev/null</code>, removes every <code>LAWKEEP_*</code> variable except <code>LAWKEEP_ROOT</code>, puts the source folders and the root first on <code>sys.path</code>, then calls the mode's handler: <code>pytest_plugin.run_check</code>, <code>strength._worker.run</code> or <code>_probe_worker.run</code>.</p>
+<ul>
+  <li><code>-I</code> isolated mode: ignores <code>PYTHONPATH</code>, other <code>PYTHON*</code> variables, the user site folder and the current folder.</li>
+  <li><code>-S</code>: <code>site</code> is not imported, so no <code>sitecustomize.py</code>, <code>usercustomize.py</code> or code line of a <code>.pth</code> file runs. <code>_boot.py</code> (standard library only) then adds the site-packages folders and the plain folder lines of their <code>.pth</code> files itself, plus the fixed setuptools editable-install finder form. Other <code>import</code> lines are not run.</li>
+  <li><code>-B</code> and <code>pycache_prefix</code>: no bytecode is written and every <code>__pycache__/*.pyc</code> in the project is ignored, so patched bytecode is never used.</li>
+  <li>Environment: <code>PYTEST_DISABLE_PLUGIN_AUTOLOAD=1</code>; <code>PYTEST_ADDOPTS</code>, <code>PYTEST_PLUGINS</code>, <code>PYTHONSTARTUP</code>, <code>PYTHONPATH</code>, <code>PYTHONHOME</code> and coverage variables removed; every caller <code>LAWKEEP_*</code> variable dropped; only <code>LAWKEEP_ROOT</code>, a private <code>HYPOTHESIS_STORAGE_DIRECTORY</code> and (strength and probe only) <code>PYTHONHASHSEED=0</code> are set.</li>
+  <li><code>--noconftest</code>: no <code>conftest.py</code> is read. The plugin loads only the <em>fixtures</em> of <code>laws/conftest.py</code>; hooks there are ignored and flagged. The empty ini means the project's pytest options (e.g. <code>addopts = -k 'not refund'</code>) do not apply.</li>
+  <li>Results: JSON lines on an inherited pipe whose number is only in the request (POSIX; a results file elsewhere, untested). The gate sends one record and closes the pipe at once; strength streams records, so a run stopped at its time limit keeps what it found. Nothing about the channel is in the environment, and no environment variable can switch the plugin on.</li>
+</ul>
+<p><b>The plugin</b> (<code>pytest_plugin.py</code>) is passive in every normal pytest run (it only registers the <code>law</code> marker through the <code>pytest11</code> entry point). When active it: collects <code>@law</code> items whatever their names; lists plain tests in <code>laws/</code> as ignored; forces the profile on each law (at least <code>examples</code> inputs, all phases, the deadline, <code>print_blob</code> off, a fixed per-law seed <code>sha256(law_id)</code> on <code>pr</code>, the per-law ledger database); records status, examples tried, the shrunk falsifying example split into arguments, failure text, time, new failing choice sequences. An <code>xfail</code> law that fails is reported as failing. A skip raised during the call, or <code>assume()</code> from outside <code>laws/</code>, is an <b>error</b>.</p>
+<p>Why a fixed seed instead of Hypothesis's <code>derandomize=True</code>? That setting turns off the example database, so saved failing examples could not be replayed.</p>
+</div></details>
+<div class="tablewrap"><table class="facts">
+<tr><th>Files</th><td><code>commands/check.py</code>, <code>integrity.py</code>, <code>runner.py</code>, <code>lawrun.py</code>, <code>_lawrun_child.py</code>, <code>_boot.py</code>, <code>pytest_plugin.py</code>, <code>ledger.py</code></td></tr>
+<tr><th>Integrity check</th><td>1 lock vs files (unrecorded change/added/removed); 2 append-only files only grew (also vs the git base); 3 lock explained by history (<code>lock_rewritten</code>); 4 discovery problems; 5 side doors (<code>side_door_file</code>, <code>bytecode_file</code>, <code>skip_marker</code>, <code>weakened_settings</code>, <code>laws_conftest_hook</code>, <code>site_packages_side_door</code>); 6 source that reaches for the runner (<code>source_side_door</code>); 7 approvals without a terminal (<code>approval_unconfirmed</code>; not flagged once a person confirmed or undid them). Severity <code>error</code> → check returns at least 2; <code>warning</code>/<code>info</code> → shown only.</td></tr>
+<tr><th>Gotchas</th><td>Several checks compare with a git base (<code>HEAD</code> locally). Once a change is committed locally, plain <code>check</code> may not show it; <code>check --base main</code> (or CI with the PR base) does.</td></tr>
+</table></div>
+
+<h3 id="arch-life">5.6 Law lifecycle</h3>
+<p><b>What and why:</b> everything about laws being born, changed and approved: launching the drafting agent, building example tables people can read, deciding the direction of a change, applying permissions, and summarising changes.</p>
+<div class="tablewrap"><table class="facts">
+<tr><th><code>agent_launcher.py</code></th><td><code>launch(agent, prompt, *, cwd, timeout, runner=None)</code>. Builds argv from the preset or <code>[agent] command</code> (<code>{prompt}</code> / <code>{prompt_file}</code> placeholders, else stdin). Sets <code>LAWKEEP_DRAFTING=1</code>. Tests inject <code>runner</code> and never start a real agent.</td></tr>
+<tr><th><code>examples_table.py</code></th><td>The <b>probe</b>: the law-running core in mode <code>probe</code> (child code in <code>_probe_worker.py</code>, same isolated start as the gate) swaps the law's <code>.hypothesis.inner_test</code> for a recorder, runs Hypothesis with a fixed seed, and records every input and result without stopping at the first failure. Project functions the law calls are wrapped so the table can show "refund() → 40.00"; the same wrappers return deliberately broken results for <code>direction</code>. No pytest here.</td></tr>
+<tr><th><code>direction.py</code></th><td>Stricter / same / looser / unclear (section 2.4).</td></tr>
+<tr><th><code>permissions.py</code></th><td>Direction → permission key → auto or ask.</td></tr>
+<tr><th><code>draft_edits.py</code></th><td>After <code>lawkeep draft</code>: the drafting agent's edits to approved files (laws, existing generators, <code>lawkeep.toml</code>, helpers) are put back and become waiting proposals, one per file, never applied automatically (<code>capture_and_restore</code>, <code>make_proposals</code>, <code>additions_only</code> splits new generators from changed ones).</td></tr>
+<tr><th><code>lawchanges.py</code></th><td><code>changes_since</code>, <code>list_pending</code>, <code>build_report</code>, <code>render_since(..., as_markdown=)</code>: the law change report used by <code>check</code>, <code>report</code> and <code>hook session-end</code>.</td></tr>
+<tr><th>Writes</th><td><code>laws/drafts/*.py</code>, <code>laws/drafts/drafts.json</code>, <code>laws/drafts/strategies.py</code>, <code>laws/drafts/proposals/&lt;id&gt;/</code>, and (through <code>record_change</code>) <code>laws/</code>, history and lock.</td></tr>
+<tr><th>Gotchas</th><td>A draft <em>file</em> is the unit of approval. <code>approve</code> trusts the hashes in the append-only history over <code>meta.json</code>. The probe sets an explicit Hypothesis seed: <code>derandomize</code> alone is not stable there, because it hashes the recorder function, whose signature holds object addresses (this made a direction label flip between runs until 2026-11-23).</td></tr>
+</table></div>
+
+<h3 id="arch-strength">5.7 Strength and protection</h3>
+<p><b>What and why:</b> grade the laws, and show which changed code no law protects. It also supplies planted-bug evidence to <code>direction</code>.</p>
+<div class="tablewrap"><table class="facts">
+<tr><th>Files</th><td><code>strength/core.py</code> (<code>run_strength</code>, <code>run_quick_check</code>, <code>catch_matrix</code>, <code>result_for</code>), <code>strength/_worker.py</code> (mode <code>strength</code> of the law-running core, started by <code>core.run_worker</code>: coverage contexts, swaps, bug planting), <code>strength/mutants.py</code>, <code>strength/sourcemap.py</code> (functions ↔ files by reading code), <code>strength/render.py</code> (Rich screens and Markdown), <code>strength/types.py</code> (<code>PlantedBug</code>, <code>CatchMatrix</code>), <code>protection.py</code></td></tr>
+<tr><th>Reads</th><td>source files, laws, git diff. <b>Writes nothing</b> in the user's project (a test snapshots every file to prove it).</td></tr>
+<tr><th>Planted bug ids</th><td>Stable for the same source, e.g. <code>src/shop/refunds.py::refund#3</code>, so the parent and the worker agree without sending code around.</td></tr>
+<tr><th>Gotchas</th><td>When an approved law and its draft share an id, result keys become <code>"&lt;law_id&gt;@&lt;file&gt;"</code>: look results up with <code>strength.result_for</code>. The time limit uses SIGALRM, so no Windows.</td></tr>
+</table></div>
+<details class="uth"><summary>Why lawkeep has its own mutation engine instead of mutmut</summary><div class="in">
+<p>The plan said "wrap mutmut or Cosmic Ray" (rule: wrap, don't rebuild). The build found that mutmut 3 can only be driven through its CLI; it copies the whole project into a <code>mutants/</code> folder inside the working tree, reads its own settings from the project, runs the whole test suite, and keeps its own results database. It cannot plant bugs only in chosen functions (the protection report needs exactly the changed ones), cannot say <em>which law</em> caught each bug, and does not run on Windows. So <code>strength/mutants.py</code> is a small <code>ast</code> mutator with operators modelled on mutmut's: comparison swaps (<code>&lt;</code>↔<code>&lt;=</code>, <code>==</code>↔<code>!=</code>, <code>in</code>↔<code>not in</code>...), arithmetic swaps (<code>+</code>↔<code>-</code>, <code>*</code>↔<code>/</code>...), boolean and constant changes, <code>return None</code>, statement deletion. Bugs exist only in memory in the worker. This choice is marked <b>pending maintainer review</b> in <code>docs/PLAN.md</code>; <code>[strength] mutation_tool</code> is currently ignored.</p>
+</div></details>
+
+<h3 id="arch-adapters">5.8 Agent adapters</h3>
+<p><b>What and why:</b> each coding agent has its own files for instructions, hooks and MCP servers. Adapters translate lawkeep's rules into each agent's format. They are thin on purpose: the core does the work, so supporting a new agent is small.</p>
+<p><b>The shared base works with any agent:</b> the CLI, the MCP server, an <code>AGENTS.md</code> section, and a git pre-commit hook. Agents with their own hooks and permission prompts get more on top.</p>
+<div class="tablewrap"><table>
+<tr><th>Agent</th><th>What the adapter installs</th><th>How the person's yes for approve is asked</th><th>Verified?</th></tr>
+<tr><td>Claude Code</td><td><code>.claude/settings.json</code> (PreToolUse on Edit|Write|MultiEdit|NotebookEdit|Bash, SessionStart, <code>permissions.ask</code> rules for <code>lawkeep approve</code>), <code>.mcp.json</code>, <code>@AGENTS.md</code> in <code>CLAUDE.md</code></td><td>hook answers "ask" + permission rules</td><td>run for real once; hook decisions re-checked while writing this guide</td></tr>
+<tr><td>Codex</td><td><code>.codex/hooks.json</code>, <code>.codex/rules/*.rules</code>, MCP in <code>.codex/config.toml</code>; reads <code>AGENTS.md</code> natively</td><td>rules file (Codex hooks cannot "ask")</td><td>docs and simulated payloads only</td></tr>
+<tr><td>Cursor</td><td><code>.cursor/hooks.json</code>, <code>.cursor/rules/*.mdc</code>, <code>.cursor/mcp.json</code></td><td><code>beforeShellExecution</code> hook answers "ask"</td><td>docs and simulated payloads only</td></tr>
+<tr><td>Copilot</td><td><code>.github/hooks/*.json</code>, <code>.github/copilot-instructions.md</code>, <code>.mcp.json</code></td><td>hook "ask" (counts as "deny" in the cloud agent and autopilot)</td><td>docs and simulated payloads only</td></tr>
+</table></div>
+<details class="uth"><summary>The guard (adapters/guard.py)</summary><div class="in">
+<p>One decision function for every agent's pre-tool-use hook. No project code runs and nothing is written. It answers <b>deny</b> for direct writes to <code>laws/</code> (except <code>laws/drafts/</code> outside <code>proposals/</code>), <code>laws.lock</code>, <code>lawkeep.toml</code> and <code>.github/workflows/lawkeep.yml</code>, with a message telling the agent to write a file under <code>laws/drafts/</code> and run <code>lawkeep propose</code>; <b>ask</b> for <code>lawkeep approve</code>; <b>allow</b> otherwise. It reads file paths from many possible keys (<code>file_path</code>, <code>path</code>, <code>target_file</code>...), Codex <code>apply_patch</code> bodies, and shell commands by what they <em>write to</em>: <code>shellwords.py</code> lexes the command (quotes, <code>$(...)</code>, here-documents, redirections), <code>writes.py</code> follows <code>cd</code>, variables, globs and a table of writing commands (<code>&gt;</code>, <code>tee</code>, <code>rm</code>, <code>mv</code>, <code>cp</code>, <code>sed -i</code>, <code>git checkout</code>/<code>restore</code>/<code>apply</code>, <code>patch</code>, <code>find -exec</code>, <code>sh -c</code>, <code>xargs</code> ...), and <code>pywrites.py</code> reads inline Python's syntax tree (<code>open(p, "w")</code>, <code>Path.write_text</code>, <code>os.remove</code>, <code>subprocess.run</code> ...). Reading or merely naming <code>laws/</code> is allowed (<code>cat laws/x.py</code>, <code>git commit -m "update laws"</code>). A write it cannot see (<code>eval</code>, paths built at run time, decoded scripts) is denied only when the command names a protected path or runs decoded code. A drafting session (<code>LAWKEEP_DRAFTING=1</code>) may write <code>laws/strategies.py</code>. <code>commands/hook.py::agent_output</code> converts the decision into each agent's JSON format.</p>
+<p>The guard is a guard rail, not a wall. Whatever it misses must still show up as an unrecorded law change in <code>check</code>. Adapters merge into the user's files, never overwrite them, and must stay idempotent (<code>init --agent all</code> twice changes nothing).</p>
+</div></details>
+
+<h3 id="arch-ci">5.9 GitHub Action and CI</h3>
+<p><b>What and why:</b> the same gate on every pull request, on a fresh checkout (so stale local files such as cached <code>.pyc</code> never reach it), with one comment that is updated rather than duplicated.</p>
+<div class="tablewrap"><table class="facts">
+<tr><th><code>action.yml</code></th><td>Composite action: set up Python, install lawkeep and the project, run <code>lawkeep check --json</code>, then <code>lawkeep report</code> (Markdown first; the protection step runs once), post or update one PR comment. Inputs include <code>working-directory</code>, <code>python-version</code> (3.12), <code>lawkeep-spec</code>, <code>install-project</code>, <code>extra-packages</code>, <code>profile</code>, <code>base-ref</code>, <code>comment</code>, <code>fail-on-broken-laws</code> (false), <code>fail-on-waiting</code> (false). Outputs: <code>result-code</code>, <code>verdict</code>, <code>summary</code>, <code>check-json</code>, <code>report-markdown</code>, <code>comment-url</code>.</td></tr>
+<tr><th>Blocking</th><td>The job fails only on a setup problem (3), unless you opt in. Fork PRs have a read-only token: the report goes to the job summary.</td></tr>
+<tr><th>This repository's CI</th><td><code>.github/workflows/ci.yml</code>: tests on Python 3.10 / 3.12 / 3.13, ruff, pyright (type check), both examples through the gate, each planted bug failing, a self-test of the action. <code>nightly.yml</code>: <code>--profile deep</code> on the examples. <code>templates/</code>: workflows for users to copy (never run here).</td></tr>
+<tr><th>Not verified</th><td>None of this has run on GitHub yet. <code>lawkeep/lawkeep@v0</code> needs a release tag that does not exist yet.</td></tr>
+</table></div>
+
+<h3 id="arch-wrap">5.10 Tools lawkeep wraps</h3>
+<div class="tablewrap"><table>
+<tr><th>Tool</th><th>Used for</th><th>Where</th></tr>
+<tr><td>pytest</td><td>finding and running laws (each law is a pytest test)</td><td><code>runner.py</code>, <code>pytest_plugin.py</code>, <code>strength/_worker.py</code></td></tr>
+<tr><td>Hypothesis</td><td>generating inputs, shrinking, replaying saved failures</td><td>everywhere laws run; <code>st</code></td></tr>
+<tr><td>CrossHair</td><td>experimental symbolic input search (L3), as a Hypothesis backend</td><td><code>check --deep-check</code>, extra <code>lawkeep[deep]</code></td></tr>
+<tr><td>coverage.py</td><td>which functions each law runs; functions no law touches</td><td><code>strength/_worker.py</code></td></tr>
+<tr><td>git</td><td>what changed (protection report, side-door and append-only checks)</td><td><code>protection.py</code>, <code>integrity.py</code></td></tr>
+<tr><td>Rich</td><td>terminal output</td><td><code>ui.py</code></td></tr>
+<tr><td>your coding agent</td><td>writing drafts in a separate, non-interactive session</td><td><code>agent_launcher.py</code></td></tr>
+<tr><td>mutmut</td><td><b>not</b> wrapped in v0.1 (see 5.7); still an optional extra</td><td>—</td></tr>
+</table></div>
+<p>One way of running laws (merged 2026-11-23): <code>lawrun.py</code> starts every law-running process with the same isolation rules, request channel (stdin) and results pipe, in one of three modes: <code>check</code> (the gate: per-law verdicts), <code>strength</code> (<code>strength</code>, protection, planted bugs for <code>propose</code>: per-law coverage and hundreds of in-memory swaps in one process) and <code>probe</code> (example tables for <code>draft</code>, <code>approve</code>, <code>propose</code>: per-input results). The modes differ only in what runs inside the child; a new kind of law run should be a new mode, not a new way of starting Python.</p>
+</section>
+
+<!-- ============================================================ 6 -->
+<section id="tour">
+<h2>6. A guided tour of the repository</h2>
+<p>Every project folder has a short <code>AGENTS.md</code> describing it (exceptions below). Read the one in a folder before changing anything there.</p>
+<div class="tablewrap"><table>
+<tr><th>Path</th><th>What it is</th></tr>
+<tr><td><code>AGENTS.md</code>, <code>CLAUDE.md</code></td><td>rules for any agent or person working on lawkeep; <b>"Current state"</b> is the live status. <code>CLAUDE.md</code> just imports <code>AGENTS.md</code>.</td></tr>
+<tr><td><code>docs/PLAN.md</code></td><td>the design source of truth: principles, concepts, scope, roadmap, risks, <b>Decisions</b> (build choices marked "pending maintainer review"), open questions</td></tr>
+<tr><td><code>docs/ARCHITECTURE.md</code></td><td>the code contract: conventions, data formats, module signatures, commands, call graph</td></tr>
+<tr><td><code>docs/OUTPUT-STYLE.md</code></td><td>how every command talks to people</td></tr>
+<tr><td><code>docs/guide/</code></td><td>user guides: <code>non-technical.md</code> (a week with lawkeep through an agent), <code>developer.md</code>, <code>recipes.md</code> (patterns for strong laws, traps)</td></tr>
+<tr><td><code>docs/onboarding.html</code></td><td>this guide</td></tr>
+<tr><td><code>src/lawkeep/</code></td><td>the package (section 5): foundation modules at the top level, plus <code>commands/</code>, <code>adapters/</code> (with <code>templates/</code>: the AGENTS.md snippet, pre-commit block, starting <code>strategies.py</code>, workflow for <code>init --ci</code>), <code>strength/</code></td></tr>
+<tr><td><code>tests/</code></td><td>782 tests (collected 2026-11-23). Prefixes: <code>test_core_*</code>, <code>test_gate_*</code>, <code>test_strength_*</code> / <code>test_protection_*</code> / <code>test_report_*</code>, <code>test_lifecycle_*</code>, <code>test_adapters_*</code>, <code>test_ui_output.py</code> (fits 80 and 60 columns, no ANSI in plain mode, JSON keys unchanged); <code>*_review_fixes.py</code> cover the 2026-11-22 review fixes; <code>test_typing_fixes_*.py</code> cover bugs found while adding type checking (2026-11-23); <code>test_lawrun.py</code> the law-running core (every mode isolated)</td></tr>
+<tr><td><code>tests/tamper/</code></td><td>the <b>cheating test suite</b> (45 tests): every known trick played against a temp git copy of <code>examples/billing</code>, each shown to be caught. <code>test_tamper_tricks.py</code> (law edits, conftest/sitecustomize/.pth/.pyc side doors, skip/xfail, fewer examples, lock and history rewrites, special-casing the failing input, routing around a law with <code>refund_v2</code>), <code>test_tamper_in_process.py</code> (tricks from inside the law process: must be defeated or flagged, never a silent pass), <code>test_tamper_examples.py</code> (the examples are consistent and fail as expected)</td></tr>
+<tr><td><code>tests/fixtures/</code></td><td>made-up projects: <code>gate/refunds_project</code> (+ <code>buggy_refunds.py</code>), <code>strength/shop</code> (one deliberately one-sided law, one strong law, one uncovered function), <code>lifecycle/teashop</code> + <code>fake_agent.py</code> (stands in for a coding agent; modes good, failing, naughty, nothing, crash) + <code>proposals/</code> (stricter, looser, renamed, same-results, skip, broken...)</td></tr>
+<tr><td><code>examples/billing</code></td><td>Corner Shop: charges, 2% card fee, refunds, discount codes, rounding; 6 laws; <code>planted_bug.patch</code>, <code>unprotected_change.patch</code></td></tr>
+<tr><td><code>examples/bookings</code></td><td>Riverside Barbers: one chair's appointment book with a settable clock; 6 laws; <code>planted_bug.patch</code> lets two bookings overlap</td></tr>
+<tr><td><code>examples/make_example_history.py</code></td><td>wrote the examples' first lock and history (rerunning it rebuilds them as approved drafts)</td></tr>
+<tr><td><code>action.yml</code>, <code>.github/workflows/</code></td><td>the GitHub Action and this repository's CI (section 5.9); <code>lawkeep.yml</code> there is lawkeep checking itself (see the box below)</td></tr>
+<tr><td><code>lawkeep.toml</code>, <code>laws.lock</code>, <code>laws/</code>, <code>.mcp.json</code>, <code>.claude/settings.json</code></td><td>lawkeep's own lawkeep setup: lawkeep checks itself (see the box below)</td></tr>
+<tr><td><code>pyproject.toml</code>, <code>uv.lock</code>, <code>.python-version</code></td><td>packaging (hatchling; console script <code>lawkeep = lawkeep.cli:main</code>; pytest11 entry point; extras <code>deep</code>, <code>mcp</code>, <code>mutation</code>; dev group pytest + ruff + pyright; ruff line length 100; <code>[tool.pyright]</code> type-check settings)</td></tr>
+<tr><td><code>LOCAL-SETUP.md</code></td><td>machine-specific notes, not committed</td></tr>
+</table></div>
+<div class="box note"><span class="t">lawkeep checks itself</span>
+<p>The maintainer decided on 2026-11-22 that this repository uses lawkeep on its own code ("eating our own cooking"). These files in the repository root are intentional, so keep them:</p>
+<ul>
+  <li><code>lawkeep.toml</code>, <code>laws.lock</code> and <code>laws/</code>: the settings, the fingerprints and three approved laws about <code>lawkeep.exitcodes</code> (for example how <code>exitcodes.combine</code> picks one result code from several).</li>
+  <li><code>.mcp.json</code> and <code>.claude/settings.json</code>: the lawkeep MCP server and the guard hook for Claude Code, plus an "ask" rule for <code>lawkeep approve</code>.</li>
+  <li><code>.git/hooks/pre-commit</code> (local only) and <code>.github/workflows/lawkeep.yml</code>, which runs the action from this checkout (<code>uses: ./</code> with <code>lawkeep-spec: "."</code>).</li>
+</ul>
+<p>What it means for you:</p>
+<ul>
+  <li><b>Run <code>uv run lawkeep check</code></b> in the repository root before you finish; it should say ALL LAWS HOLD.</li>
+  <li><b>Never edit the root <code>laws/</code>, <code>laws.lock</code>, <code>lawkeep.toml</code> or <code>lawkeep.yml</code> by hand.</b> The guard blocks coding agents from doing it, and a hand edit shows up as an unrecorded law change. To change a law, write the new version under <code>laws/drafts/</code> and run <code>lawkeep propose LAW_ID --file laws/drafts/... --reason "..."</code>; a person decides with <code>lawkeep approve</code>.</li>
+  <li>The guard reads shell commands too, but only stops what they <em>write to</em> a protected path: reading <code>laws/</code>, grepping for "laws" or a commit message about laws is fine. If a command builds its target at run time (<code>eval</code>, <code>$(...)</code> in a path) and also names a protected path, it is stopped; write the command so its targets are plain to see.</li>
+  <li>Tests never run lawkeep commands that change files with this repository as the project; they use <code>tmp_path</code> copies.</li>
+</ul></div>
+<div class="box note"><span class="t">Where AGENTS.md files are deliberately missing</span>
+<ul>
+  <li>Inside any <code>laws/</code> folder: lawkeep fingerprints every file there, so an extra file is an unrecorded law change.</li>
+  <li>Inside the fixture projects <code>tests/fixtures/&lt;area&gt;/&lt;project&gt;/</code>: tests copy them, and an <code>AGENTS.md</code> changes what <code>lawkeep init</code> finds.</li>
+  <li>The repository's own lawkeep setup (root <code>laws/</code>, <code>.claude/</code>; see "lawkeep checks itself" above), and generated folders (<code>.venv</code>, <code>__pycache__</code>, <code>.hypothesis</code>, caches).</li>
+</ul></div>
+</section>
+
+<!-- ============================================================ 7 -->
+<section id="data">
+<h2>7. Data formats</h2>
+<p>All of these live in the user's project. Paths inside them are relative with forward slashes. Timestamps are UTC with microseconds and <code>Z</code>.</p>
+
+<h3>The project layout on disk</h3>
+<pre><code>lawkeep.toml                  settings + permissions          fingerprinted
+laws.lock                     fingerprints (TOML)             written only by history.record_change
+laws/*.py                     approved laws                   fingerprinted
+laws/strategies.py            project input generators        fingerprinted
+laws/conftest.py              law fixtures (optional)         fingerprinted
+laws/history.jsonl            law history, append-only        line count + prefix hash in laws.lock
+laws/failing_examples.jsonl   saved failing inputs, append-only
+laws/drafts/                  drafts + pending proposals      NOT fingerprinted, ignored by the gate
+.lawkeep/session.json         local session marker            not committed, not protected</code></pre>
+<p>Commit everything except <code>.lawkeep/</code>.</p>
+
+<h3>lawkeep.toml</h3>
+<pre><code>[permissions]              <span class="c"># see section 2.4</span>
+add_law = "auto"
+weaken_law = "ask"         <span class="c"># always ask</span>
+
+[check]
+profile = "pr"             <span class="c"># default profile</span>
+[check.pr]                 <span class="c"># any [check.&lt;name&gt;] table defines a profile</span>
+examples    = 200          <span class="c"># Hypothesis max_examples per law</span>
+derandomize = true         <span class="c"># fixed seed: same code → same verdict</span>
+<span class="c"># backend = "crosshair"    # L3, experimental; deadline_ms = 0; seed = ...</span>
+[check.deep]
+examples    = 2000
+derandomize = false
+
+[project]
+source = ["src"]           <span class="c"># code under test (default "src" if it exists, else ".")</span>
+
+[strength]
+quick_check     = true
+min_bugs_caught = 1
+<span class="c"># mutation_tool = "mutmut"   # currently ignored</span>
+
+[agent]                    <span class="c"># how `draft` starts your agent</span>
+name = "claude-code"       <span class="c"># claude-code | codex | cursor | copilot | other</span>
+<span class="c"># command = "..."          # override; {prompt} / {prompt_file}; else stdin</span>
+timeout_seconds = 900</code></pre>
+
+<h3>laws.lock</h3>
+<pre><code><span class="c"># laws.lock - written by lawkeep; do not edit by hand.</span>
+version = 1
+generated_at = "2026-11-22T10:20:39.937575Z"
+lawkeep_version = "0.1.0.dev0"
+
+[files]                                     <span class="c"># every fingerprinted file → sha256 of its bytes</span>
+"lawkeep.toml" = "sha256:3c14…"
+"laws/refunds.py" = "sha256:d0ae…"
+
+[laws."refunds.refund_never_exceeds_payment"]   <span class="c"># per law, from static discovery</span>
+sentence = "A refund never exceeds the original payment"
+file = "laws/refunds.py"
+hash = "sha256:…"                           <span class="c"># the law's own source incl. decorators</span>
+
+[append_only."laws/history.jsonl"]
+lines = 7                                   <span class="c"># lines present when the lock was written</span>
+prefix_sha256 = "sha256:…"                  <span class="c"># hash of exactly those lines</span></code></pre>
+
+<h3>laws/history.jsonl</h3>
+<p>One JSON object per line, keys sorted, append-only. A real waiting entry from the <code>+ 1</code> proposal, shortened:</p>
+<pre><code>{"action": "change_law",               <span class="c">// init, add_law, add_example, rename_target, change_law,</span>
+                                       <span class="c">// remove_law, skip_law, reject_draft, accept_unrecorded_change, add_strategy,</span>
+                                       <span class="c">// change_settings, change_strategy, change_law_file,</span>
+                                       <span class="c">// confirm_approval, undo_approval...</span>
+ "actor": "agent:claude-code",          <span class="c">// agent:…, person:…, or "lawkeep"</span>
+ "approved_by": null,                   <span class="c">// person:&lt;name&gt; once someone says yes</span>
+ "details": {
+   "evidence": "both versions gave the same answer on 200 inputs and on 40 deliberately broken versions…",
+   "permission_key": "change_law",
+   "proposal_path": "laws/drafts/proposals/h-b4a670cd/",
+   "base_sha256": "sha256:d0ae…",        <span class="c">// target file when proposed</span>
+   "proposal_sha256": "sha256:0721…",    <span class="c">// approve refuses if either changed</span>
+   "target_file": "laws/refunds.py"},   <span class="c">// the drafting agent's edits also add from_draft, whole_file, kind, changes, diff</span>
+ "direction": "unclear",                <span class="c">// stricter | same | looser | unclear | null</span>
+ "files": {},                           <span class="c">// hashes AFTER the change (applied entries only)</span>
+ "id": "h-b4a670cd",
+ "law_id": "refunds.refund_never_exceeds_payment",
+ "permission_used": "ask",              <span class="c">// auto | ask | none</span>
+ "reason": "allow a dollar of slack",
+ "refers_to": null,                     <span class="c">// the waiting entry an approve/reject decides</span>
+ "sentence_after": null, "sentence_before": null,
+ "status": "waiting",                   <span class="c">// applied | waiting | rejected</span>
+ "timestamp": "2026-11-22T17:2…Z", "v": 1}</code></pre>
+<p>Pending decisions are <code>waiting</code> entries that no later entry <code>refers_to</code>. Approvals record <code>details.channel</code> and <code>details.terminal</code>.</p>
+
+<h3>laws/failing_examples.jsonl (the ledger)</h3>
+<p>A real line saved by <code>check</code> with the planted bug:</p>
+<pre><code>{"choices": "QRlBAEEZ",                       <span class="c">// base64 Hypothesis choice sequence (replayed)</span>
+ "choices_format": "hypothesis-choices",
+ "example": {"amount": "Decimal('0.25')",
+             "charge": "charge(price=Decimal('0.25'), discount_code=None)"},
+ "failure": "AssertionError: assert Decimal('0.26') &lt;= Decimal('0.25')",
+ "found_by": "lawkeep",
+ "hypothesis_version": "6.170.17",
+ "law_id": "refunds.refund_never_exceeds_payment",
+ "profile": "pr", "ts": "2026-11-22T17:17:13.113745Z", "v": 1}</code></pre>
+<p>Deduplicated by <code>(law_id, choices)</code>. Lines without <code>choices</code> are shown but cannot be replayed.</p>
+<div class="box warn"><span class="t">Known gap</span>A failing example that <code>check</code> just saved, but that is not yet committed or recorded in <code>laws.lock</code>, can still be deleted without a flag. Once committed, git protects it.</div>
+
+<h3>Proposals</h3>
+<p><code>laws/drafts/proposals/&lt;history id&gt;/proposed.py.txt</code> (the complete new law file) and <code>meta.json</code> (<code>history_id</code>, <code>law_id</code>, <code>action</code>, <code>direction</code>, <code>delete</code>, <code>target_file</code>, <code>qualname</code>, <code>base_sha256</code>, <code>proposal_sha256</code>, <code>actor</code>, <code>reason</code>). <code>approve</code> trusts the copy of the hashes in the history, not <code>meta.json</code>.</p>
+
+<h3>.lawkeep/session.json</h3>
+<pre><code>{"started_at": "2026-11-22T09:58:32.932391Z", "agent": "claude-code"}</code></pre>
+
+<h3>JSON reports</h3>
+<p>Every command with <code>--json</code> prints one document. The first keys are always <code>kind</code>, <code>schema_version</code> (1), <code>exit_code</code>, <code>summary</code>, <code>lawkeep_version</code>.</p>
+<div class="tablewrap"><table>
+<tr><th>Command</th><th><code>kind</code></th><th>Extra keys</th></tr>
+<tr><td>check</td><td><code>check</code></td><td><code>profile</code>, <code>root</code>, <code>laws</code> [LawResult], <code>integrity</code> [IntegrityIssue], <code>waiting</code> [LawChange], <code>notes</code>, <code>started_at</code>, <code>duration_seconds</code>, <code>only_laws</code>, <code>laws_known</code>, <code>waiting_for_person</code> {count, ids, by_kind, items}, <code>person_present</code>, <code>person_present_reason</code></td></tr>
+<tr><td>strength</td><td><code>strength</code></td><td><code>mode</code> (quick|full), <code>laws</code> [StrengthResult], <code>uncovered_functions</code>, <code>notes</code></td></tr>
+<tr><td>report</td><td><code>report</code></td><td><code>since</code>, <code>changes</code> [LawChange], <code>integrity</code>, <code>protection</code> (ProtectionReport or null), <code>notes</code>, <code>waiting_for_person</code>, <code>person_present</code>, <code>person_present_reason</code></td></tr>
+<tr><td>propose</td><td><code>propose</code></td><td><code>law_id</code>, <code>direction</code>, <code>decision</code> (applied|waiting|rejected|unchanged|refused), <code>permission_key</code>, <code>permission_value</code>, <code>reason</code>, <code>evidence</code>, <code>examples</code>, <code>history_id</code>, <code>person_present</code>, <code>next_step</code></td></tr>
+<tr><td>init, draft, approve, hook, errors</td><td>command name</td><td><code>lines</code>, <code>data</code>, <code>hint</code></td></tr>
+</table></div>
+<p>A real <code>LawResult</code> from the billing example:</p>
+<pre><code>{"law_id": "discount_amounts.discount_takes_off_exactly_what_it_promises",
+ "sentence": "Each discount code takes off exactly what it promises: …",
+ "status": "holds",                 <span class="c">// holds | fails | error | skipped | not_run</span>
+ "level": "L2",
+ "examples_tried": 203,
+ "simplest_failing_example": null,  <span class="c">// {arg: repr} when it fails</span>
+ "failure_message": null,
+ "duration_seconds": 0.1279,
+ "evidence": {"profile": "pr", "backend": "hypothesis", "seed": 9787404417585985909,
+              "derandomize": true, "max_examples": 200, "explicit_examples": 3,
+              "saved_failures_replayed": 0, "inputs_thrown_away": 0,
+              "stop_reason": "settings.max_examples=200"},
+ "file": "laws/discount_amounts.py",
+ "nodeid": "laws/discount_amounts.py::discount_takes_off_exactly_what_it_promises"}</code></pre>
+<p>The full list of item shapes (<code>IntegrityIssue</code> kinds, <code>StrengthResult</code>, <code>ProtectionResult</code>, <code>LawChange</code>, <code>ExampleRow</code>) is in <code>docs/ARCHITECTURE.md</code> §4.6. Change it only by adding, never by silently renaming.</p>
+</section>
+
+<!-- ============================================================ 8 -->
+<section id="safety">
+<h2>8. The safety model</h2>
+<p>lawkeep assumes an agent might try to make failing laws pass without fixing the code. Its job is to make every such attempt <b>visible</b>. Here is each defence, what it catches, and where it lives.</p>
+<div class="tablewrap"><table>
+<tr><th>Trick</th><th>Defence</th><th>Where</th></tr>
+<tr><td>edit a law, a generator or <code>lawkeep.toml</code></td><td>fingerprints vs <code>laws.lock</code> → unrecorded law change (code 2); the guard hook denies the edit up front where the agent supports hooks</td><td><code>integrity.py</code>, <code>lock.py</code>, <code>adapters/guard.py</code></td></tr>
+<tr><td>edit the law <em>and</em> rewrite <code>laws.lock</code> by hand</td><td>the lock must be explained by the history (<code>lock_rewritten</code>)</td><td><code>history.unexplained_lock_paths</code></td></tr>
+<tr><td>delete a history line or saved failure</td><td>append-only line count + prefix hash, and the git base</td><td><code>lock.check_append_only</code></td></tr>
+<tr><td><code>conftest.py</code> outside <code>laws/</code>, <code>sitecustomize.py</code>, <code>.pth</code></td><td>never loaded or run (<code>--noconftest</code>, <code>-I -S</code>), and flagged</td><td><code>lawrun.py</code>, <code>_lawrun_child.py</code>, <code>_boot.py</code></td></tr>
+<tr><td>patched <code>.pyc</code> files</td><td>ignored (<code>-B</code>, empty <code>pycache_prefix</code>) and flagged</td><td><code>integrity.check_bytecode</code></td></tr>
+<tr><td>skip / xfail / "try 1 case"</td><td>flagged; skips raised at run time are errors; profile minimum forced; such edits are "looser" in <code>propose</code></td><td><code>pytest_plugin.py</code>, <code>direction.py</code></td></tr>
+<tr><td>project pytest options that deselect laws</td><td>empty ini, <code>-c</code>, plugin autoload off</td><td><code>runner.py</code></td></tr>
+<tr><td>special-case the printed failing input</td><td>Hypothesis keeps searching and finds a different simplest input; saved inputs are replayed</td><td>Hypothesis, <code>ledger.py</code></td></tr>
+<tr><td>write a new function no law tests</td><td>protection report: "Not protected — read this one"</td><td><code>protection.py</code></td></tr>
+<tr><td>code under test that imports pytest/Hypothesis/lawkeep, reads <code>LAWKEEP_*</code>, raises skips, always-true comparisons, shadows a module</td><td>flagged as <code>source_side_door</code> (error if changed since the git base)</td><td><code>integrity.scan_source</code></td></tr>
+<tr><td>rewrite results at exit (e.g. an <code>atexit</code> hook)</td><td>results travel through a pipe written once and closed (its number is never in the environment); <code>LAWKEEP_*</code> removed before project code imports</td><td><code>lawrun.py</code>, <code>_lawrun_child.py</code>, <code>pytest_plugin.py</code></td></tr>
+<tr><td>an agent approves its own change</td><td>approve needs ids for weakening, records <code>terminal: false</code>, listed by check/report; the agent's own permission prompt asks the person; no MCP approve tool</td><td><code>commands/approve.py</code>, adapters</td></tr>
+</table></div>
+
+<h3>Known limits, stated honestly</h3>
+<div class="box danger"><span class="t">Limit: the code under test is trusted</span>Laws call your code in the same Python process as lawkeep's law runner. Code written to cheat (for example by patching Hypothesis from inside) could change results. lawkeep flags suspicious source files and makes cheating harder, but flagged is not prevented. Read flagged files before trusting a green result.</div>
+<div class="box danger"><span class="t">Limit: approvals are not authenticated</span>lawkeep records who <em>claimed</em> to approve. It cannot check who typed "yes". If nobody remembers saying yes, undo the change.</div>
+<div class="box danger"><span class="t">Limit: "same" and "stricter" are evidence, not proof</span>They come from sample inputs, broken versions and planted bugs, plus code rules.</div>
+<div class="box danger"><span class="t">Limit: other edges</span>
+<ul>
+  <li>Objects whose <code>==</code> or <code>&lt;=</code> always say yes pass equality and bound laws; only comparison methods that visibly return a constant are flagged.</li>
+  <li>Git decides what is "new": a local commit hides some flags from plain <code>check</code> (use <code>--base</code>).</li>
+  <li>A law that throws most inputs away checks fewer cases; the report says how many were thrown away.</li>
+  <li>The guard reads shell commands on a best-effort basis.</li>
+  <li>Untested: Windows (hooks and the MCP launcher are POSIX <code>sh</code>, the strength timer uses SIGALRM, the results pipe is POSIX-only), Python other than 3.12, Codex/Cursor/Copilot in real use, the Action on GitHub.</li>
+</ul></div>
+</section>
+
+<!-- ============================================================ 9 -->
+<section id="dev">
+<h2>9. How to develop on lawkeep</h2>
+
+<h3>Setup</h3>
+<pre><code>cd lawkeep
+uv sync                    <span class="c"># creates .venv, installs lawkeep in editable mode + dev tools</span>
+uv sync --all-extras       <span class="c"># also CrossHair, mcp, mutmut (what CI uses)</span>
+uv run lawkeep --help</code></pre>
+<p><b>uv</b> is the Python package and environment manager this project uses. <code>uv run X</code> runs X inside the project's environment.</p>
+
+<h3>Try it in five minutes</h3>
+<pre><code>cp -r examples/billing /tmp/billing &amp;&amp; cd /tmp/billing
+git init -q &amp;&amp; git add -A &amp;&amp; git commit -qm base
+cd -   <span class="c"># back to the lawkeep checkout</span>
+uv run lawkeep check    --root /tmp/billing            <span class="c"># ALL LAWS HOLD, exit 0</span>
+uv run lawkeep strength --root /tmp/billing            <span class="c"># NO WEAK LAWS FOUND</span>
+(cd /tmp/billing &amp;&amp; git apply planted_bug.patch)
+uv run lawkeep check    --root /tmp/billing; echo $?   <span class="c"># SOME LAWS FAIL, 1</span></code></pre>
+<div class="box danger"><span class="t">Work on copies of examples/, never in place</span>Always try commands on copies. Editing anything under an example's <code>laws/</code> or its <code>lawkeep.toml</code> breaks its fingerprints. In the repository root, <code>uv run lawkeep check</code> is fine (lawkeep checks itself), but do not run <code>init</code>, <code>draft</code> or <code>propose</code> there unless you mean to change lawkeep's own laws.</div>
+
+<h3>Tests, lint and type check</h3>
+<pre><code>uv run pytest tests/test_gate_runner.py      <span class="c"># one file while you work</span>
+uv run pytest                                <span class="c"># whole suite: 542 tests, about 6-7 minutes</span>
+uv run pytest tests/tamper -rxX              <span class="c"># cheating suite, 45 tests, a few minutes</span>
+uv run ruff check src tests &amp;&amp; uv run ruff format --check src tests
+uv run pyright                               <span class="c"># type check: must say 0 errors</span>
+uv run lawkeep check                         <span class="c"># lawkeep's own laws: ALL LAWS HOLD</span></code></pre>
+<ul>
+  <li>The slow tests (gate, strength, lifecycle, tamper) start real isolated Python processes.</li>
+  <li>Tests run with <code>--import-mode=importlib</code> and there is no shared <code>conftest.py</code>, on purpose: put helpers in your own test file.</li>
+  <li>Use <code>tmp_path</code> copies only. Run subprocesses with <code>cwd=tmp_path</code>.</li>
+  <li>Never call a real coding agent or the network: inject runners or use <code>tests/fixtures/lifecycle/fake_agent.py</code>.</li>
+  <li>Never add files inside a fixture project, and never put a <code>conftest.py</code> anywhere a test project is copied from: this repository's own pytest run would load it.</li>
+</ul>
+
+<h3>Type checking with pyright</h3>
+<p>Python does not check types before it runs: if a function expects a number and gets <code>None</code>, you only find out when that line runs, maybe in a user's project. A <b>type checker</b> reads the code without running it and checks that every value fits the type written next to it (<code>def refund(amount: int) -&gt; int</code>), so many mistakes show up in your editor or in CI instead. lawkeep uses <b>pyright</b>, the checker behind VS Code's Python support (Neovim users often run <b>basedpyright</b>, which reads the same settings).</p>
+<ul>
+  <li><b>Command:</b> <code>uv run pyright</code>. It must report <code>0 errors</code>; CI runs it next to ruff, with the pyright version pinned in <code>uv.lock</code>.</li>
+  <li><b>Strict mode for the package:</b> <code>src/lawkeep</code> is checked in <em>strict</em> mode: every function has types, and no value may be "unknown". An empty list needs its element type (<code>out: list[str] = []</code>). JSON read from disk goes through <code>models.as_dict</code> / <code>models.as_list</code>, so its shape is checked where it enters.</li>
+  <li><b>Standard mode for tests:</b> tests are checked less strictly, but a function that can return <code>None</code> still needs <code>assert value is not None</code> before you use the value.</li>
+  <li><b>Silencing an error</b> is rare and always names the rule and the reason: <code># pyright: ignore[reportPrivateUsage]  # pytest has no public API for this</code>. Plain <code># type: ignore</code> is switched off.</li>
+  <li><b>py.typed:</b> the package contains an empty file <code>src/lawkeep/py.typed</code>. It tells type checkers in other people's projects "this package has type hints, use them", so people writing laws get completions and type errors for <code>law</code>, <code>given</code> and <code>st</code>.</li>
+  <li>The settings live in <code>[tool.pyright]</code> in <code>pyproject.toml</code>. Adding type checking found real bugs, now covered by <code>tests/test_typing_fixes_*.py</code>.</li>
+</ul>
+
+<h3>The rules for anyone (person or agent) working here</h3>
+<ol>
+  <li><b>Follow the plan.</b> If a change departs from <code>docs/PLAN.md</code>, ask the maintainer, or update the plan in the same change and say so.</li>
+  <li><b>Open questions stay open.</b> Items under "Open questions" need a human decision.</li>
+  <li><b>Honest wording.</b> Never "proven" or "foolproof" below L4. Never claim the AI <em>cannot</em> get around lawkeep.</li>
+  <li><b>Fit the team, don't police it.</b> No features that force a team process; stricter enforcement is optional and off by default.</li>
+  <li><b>Wrap, don't rebuild.</b> Use Hypothesis, CrossHair, mutation testers and Dafny. If wrapping is impractical, say why (as with mutmut).</li>
+  <li><b>No private code.</b> Examples and tests use made-up projects only.</li>
+  <li><b>Every folder has an <code>AGENTS.md</code>.</b> When you add a folder, add one; when you change a folder's code, update it in the same change.</li>
+  <li><b>Keep <code>AGENTS.md</code> "Current state" and <code>docs/PLAN.md</code> "Decisions" current.</b></li>
+</ol>
+
+<h3>How to add things</h3>
+<h4>A new command</h4>
+<ol>
+  <li>Create <code>src/lawkeep/commands/&lt;name&gt;.py</code> with <code>HELP</code>, <code>add_arguments(parser)</code> and <code>run(args) -&gt; int</code>.</li>
+  <li>Add the name to <code>cli.COMMANDS</code> (and <code>DEFAULT_HELP</code>). Do not add arguments in <code>cli.py</code>.</li>
+  <li>Pattern: <code>root = paths.require_root(args.root); cfg = config.load_config(root)</code>, build a report from <code>models</code>, build the human text only when <code>not args.json</code> (with <code>ui</code> and <code>explain</code>, banner first, <code>ui.next_step</code> last), <code>output.emit(report, args.json, text=...)</code>, return the code.</li>
+  <li>Raise <code>errors.SetupError(msg, hint=...)</code> for setup problems. Show <code>cfg.warnings</code>. Never prompt in JSON mode or without a terminal.</li>
+  <li>Document it in <code>docs/ARCHITECTURE.md</code> §7, the guides and <code>commands/AGENTS.md</code>; add tests.</li>
+</ol>
+<h4>A new agent adapter</h4>
+<ol>
+  <li>Add <code>src/lawkeep/adapters/&lt;agent&gt;.py</code> implementing the <code>Adapter</code> protocol (<code>name</code>, <code>detect(root)</code>, <code>install(root, *, hooks=True)</code>), merging into existing files and staying idempotent.</li>
+  <li>Register it in <code>base.AGENT_ORDER</code> and <code>base.all_adapters()</code>; add a preset to <code>config.AGENT_PRESETS</code>; teach <code>commands/hook.py::agent_output</code> its hook format and <code>guard.py</code> its tool names and path keys if new.</li>
+  <li>Write down which formats you checked against which docs, and say plainly what was not run in the real agent.</li>
+</ol>
+<h4>A new integrity check</h4>
+<ol>
+  <li>Add it to <code>integrity.py</code> without running project code (hash, read text, or <code>ast</code>).</li>
+  <li>Choose severity carefully: <code>error</code> makes <code>check</code> return 2.</li>
+  <li>List the new <code>kind</code> in <code>docs/ARCHITECTURE.md</code> §4.6.</li>
+  <li>Add a trick to <code>tests/tamper/</code> that first shows the trick really works on plain pytest, then that lawkeep catches it. Never weaken an assertion to make it pass; if lawkeep genuinely misses it, fix the product or mark it <code>xfail</code> with the reason and list it as not done in <code>AGENTS.md</code>.</li>
+</ol>
+
+<h3>Where decisions are recorded</h3>
+<p><code>docs/PLAN.md</code> → "Decisions" (dated table). Choices made during the build are marked <b>(pending maintainer review)</b>: for example the fingerprinted <code>lawkeep.toml</code>, unrecorded change → code 2, the permission mapping, the strict meaning of "same", the own mutation engine, the three ways of running laws, the agent presets, and the output redesign. Don't treat them as settled; don't silently reverse them either.</p>
+</section>
+
+<!-- ============================================================ 10 -->
+<section id="glossary">
+<h2>10. Glossary and FAQ</h2>
+<dl class="gloss">
+<dt>Adapter</dt><dd>The small piece of lawkeep that installs instructions, hooks and the MCP server for one coding agent.</dd>
+<dt>Append-only</dt><dd>A file where lines may only be added. lawkeep's history and saved failures are append-only.</dd>
+<dt>Approval</dt><dd>A person's recorded yes or no on a draft or proposal (<code>lawkeep approve</code>).</dd>
+<dt>Coding agent</dt><dd>An AI tool that changes code (Claude Code, Codex, Cursor, Copilot...).</dd>
+<dt>Companion law / companion credit</dt><dd>A law that pins down the exact answer next to a limit law. When companions catch everything a limit law misses, the limit law is "Fairly strong" instead of weak.</dd>
+<dt>Coverage</dt><dd>Which lines and functions ran during a test, measured with coverage.py.</dd>
+<dt>CrossHair</dt><dd>A tool that picks inputs by reasoning about the code with a solver (L3, experimental).</dd>
+<dt>Deliberately broken version</dt><dd>A dumb stand-in for a function ("always returns 0") used by the quick check.</dd>
+<dt>Direction</dt><dd>Whether a law change is stricter, same, looser or unclear.</dd>
+<dt>Draft</dt><dd>A law an agent wrote that nobody approved yet. Ignored by the gate.</dd>
+<dt>Exit code / result code</dt><dd>The number a command returns: 0 hold, 1 fail, 2 waiting, 3 setup problem.</dd>
+<dt>Fingerprint</dt><dd>A SHA-256 hash of a file's bytes. Any change changes it.</dd>
+<dt>Gate</dt><dd><code>lawkeep check</code>: one verdict for all laws.</dd>
+<dt>Generator / strategy</dt><dd>A Hypothesis recipe for making inputs (<code>st.money()</code>).</dd>
+<dt>Hook</dt><dd>A command a tool runs automatically at a moment (before a tool call, at session start, before a commit).</dd>
+<dt>Hypothesis</dt><dd>The Python property-based testing library lawkeep wraps.</dd>
+<dt>Integrity check</dt><dd>The part of <code>check</code> that compares fingerprints, history and side doors. No project code runs.</dd>
+<dt>Law</dt><dd>A rule the code must obey for every input: one sentence plus an executable check, in <code>laws/</code>.</dd>
+<dt>Law history</dt><dd><code>laws/history.jsonl</code>: every law change, who, why, who said yes.</dd>
+<dt>Ledger</dt><dd><code>laws/failing_examples.jsonl</code>: every failing input ever found.</dd>
+<dt>Lock</dt><dd><code>laws.lock</code>: the fingerprints of all law files.</dd>
+<dt>MCP</dt><dd>Model Context Protocol: a standard way for agents to call tools. <code>lawkeep mcp</code> offers check, propose, report, list_laws.</dd>
+<dt>Mutation / planted bug / mutant</dt><dd>A copy of the code with one small deliberate change, used to see whether laws notice.</dd>
+<dt>One-sided</dt><dd>A law that checks a limit, not the right answer.</dd>
+<dt>Probe</dt><dd>The isolated process that records each input and result for example tables.</dd>
+<dt>Profile</dt><dd>A set of gate settings: <code>pr</code> (repeatable) or <code>deep</code>.</dd>
+<dt>Property-based testing</dt><dd>Testing a rule against many generated inputs instead of a few hand-picked ones.</dd>
+<dt>Proposal</dt><dd>A requested change to an approved law (<code>lawkeep propose</code>).</dd>
+<dt>Protection report</dt><dd>Which changed functions laws protect, and which a person must read.</dd>
+<dt>Shrinking</dt><dd>Simplifying a failing input until it is as small as possible.</dd>
+<dt>Side door</dt><dd>A file that could change test results without touching a law (<code>conftest.py</code>, <code>sitecustomize.py</code>, <code>.pth</code>, <code>.pyc</code>, skip markers).</dd>
+<dt>Unrecorded law change</dt><dd>A law file changed without going through lawkeep.</dd>
+<dt>Vacuous</dt><dd>Internal word for a law that holds whatever the code does.</dd>
+</dl>
+
+<div class="faq">
+<h3>FAQ</h3>
+<h4>Does lawkeep run my normal tests?</h4>
+<p>No. <code>check</code> runs only the laws in <code>laws/</code>. Your existing tests stay as they are.</p>
+<h4>Can an agent just edit the law file?</h4>
+<p>It can try. Where the agent supports hooks, the guard denies the edit. If it gets through anyway (for example through a shell trick the guard did not recognise), the next <code>check</code> says WAITING FOR YOUR DECISION and names the unrecorded change. Never silently.</p>
+<h4>Why does check return 2 and not 1 for a hand edit?</h4>
+<p>Because the laws may all hold; what is missing is a person's decision. 1 is reserved for laws that break.</p>
+<h4>Why are drafts not checked by the gate?</h4>
+<p>Nobody has agreed to them yet. A draft that fails could mean the code is buggy or the law is wrong; a person decides.</p>
+<h4>Will the same code always get the same verdict?</h4>
+<p>With the <code>pr</code> profile, yes: each law uses a fixed seed derived from its id, plus the saved failures. The <code>deep</code> profile uses new random inputs each run.</p>
+<h4>Do I need an API key for <code>draft</code>?</h4>
+<p>No. It starts your own coding agent's CLI in a separate session. The launch commands are taken from each agent's docs and have not yet been run for real.</p>
+<h4>Does the GitHub Action block merges?</h4>
+<p>No, not by default. Set <code>fail-on-broken-laws: "true"</code> or <code>fail-on-waiting: "true"</code> to opt in.</p>
+<h4>Does lawkeep work on Windows, or with TypeScript?</h4>
+<p>Not in v0.1. Windows is untested and parts are POSIX-only. Other languages come last on the roadmap (v0.6).</p>
+<h4>What is on the roadmap?</h4>
+<p>v0.2 real apps (database laws, permission laws, free laws, a fast agent profile), v0.3 fake outside services and replay, v0.4 race conditions, v0.5 Dafny proofs (L4), v0.6 other languages, v1.0 stable formats and an optional strict mode. No dates are set.</p>
+</div>
+
+<h3>What could not be verified for this guide</h3>
+<div class="box warn"><span class="t">Unverified while writing (2026-11-22)</span>
+<ul>
+  <li><code>draft</code> with a real coding agent (only <code>--dry-run</code> was run), and the interactive terminal flow of <code>approve</code>.</li>
+  <li>The Codex, Cursor and Copilot adapters inside the real agents; the Action and workflows on GitHub.</li>
+  <li><code>check --deep-check</code> (CrossHair) and <code>strength --full</code>.</li>
+</ul>
+Verified by running in temporary copies: <code>init</code>, <code>draft --dry-run</code>, <code>check</code> (pass, planted bug, hand edit), <code>strength</code>, <code>propose</code> (unclear → waiting), <code>approve --json</code> without a terminal, <code>report --base HEAD</code> with <code>refund_v2</code>, and the Claude Code guard hook's deny/ask answers.</div>
+</section>
+
+<footer>
+lawkeep onboarding guide · written 2026-11-22 against the uncommitted v0.1 code · Apache-2.0 project. When the code changes, update this file with it (see <code>docs/AGENTS.md</code>).
+</footer>
+</main>
+</div>
+<script>
+(function () {
+  var btn = document.getElementById('tocbtn');
+  var nav = document.getElementById('toc');
+  if (btn && nav) {
+    btn.addEventListener('click', function () {
+      var open = nav.classList.toggle('open');
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      btn.textContent = open ? 'Close' : 'Contents';
+    });
+    nav.addEventListener('click', function (e) {
+      if (e.target.tagName === 'A' && nav.classList.contains('open')) {
+        nav.classList.remove('open');
+        btn.setAttribute('aria-expanded', 'false');
+        btn.textContent = 'Contents';
+      }
+    });
+  }
+  var themeBtn = document.getElementById('themebtn');
+  var root = document.documentElement;
+  try { var saved = localStorage.getItem('lawkeep-theme'); if (saved) root.setAttribute('data-theme', saved); } catch (e) {}
+  if (themeBtn) themeBtn.addEventListener('click', function () {
+    var cur = root.getAttribute('data-theme');
+    if (!cur) cur = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    var next = cur === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('lawkeep-theme', next); } catch (e) {}
+  });
+  var links = Array.prototype.slice.call(document.querySelectorAll('nav#toc a'));
+  var map = {};
+  links.forEach(function (a) { map[a.getAttribute('href').slice(1)] = a; });
+  if ('IntersectionObserver' in window) {
+    var targets = Object.keys(map).map(function (id) { return document.getElementById(id); }).filter(Boolean);
+    var obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) {
+          links.forEach(function (l) { l.classList.remove('active'); });
+          var a = map[en.target.id];
+          if (a) a.classList.add('active');
+        }
+      });
+    }, { rootMargin: '-10% 0px -80% 0px' });
+    targets.forEach(function (t) { obs.observe(t); });
+  }
+})();
+</script>
+</body>
+</html>

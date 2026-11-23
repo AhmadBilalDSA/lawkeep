@@ -1,0 +1,38 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit|NotebookEdit|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if command -v lawkeep >/dev/null 2>&1; then lawkeep hook pre-tool-use --agent claude-code; elif [ -x \"$CLAUDE_PROJECT_DIR/.venv/bin/lawkeep\" ]; then \"$CLAUDE_PROJECT_DIR/.venv/bin/lawkeep\" hook pre-tool-use --agent claude-code; fi",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if command -v lawkeep >/dev/null 2>&1; then lawkeep hook session-start --agent claude-code; elif [ -x \"$CLAUDE_PROJECT_DIR/.venv/bin/lawkeep\" ]; then \"$CLAUDE_PROJECT_DIR/.venv/bin/lawkeep\" hook session-start --agent claude-code; fi",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  },
+  "permissions": {
+    "ask": [
+      "Bash(lawkeep approve *)",
+      "Bash(uv run lawkeep approve *)",
+      "Bash(uvx lawkeep approve *)",
+      "Bash(python -m lawkeep approve *)",
+      "Bash(python3 -m lawkeep approve *)",
+      "Bash(.venv/bin/lawkeep approve *)"
+    ]
+  }
+}

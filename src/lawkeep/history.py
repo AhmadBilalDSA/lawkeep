@@ -1,0 +1,294 @@
+"""The law history: ``laws/history.jsonl``, one JSON object per line, append-only.
+
+Each line is a :class:`lawkeep.models.HistoryEntry` (``to_dict()`` form). lawkeep only ever
+appends; ``laws.lock`` remembers the line count so removed or edited lines are flagged.
+
+The main entry point for anything that changes laws is :func:`record_change`: it appends a
+history entry that lists every fingerprinted file that changed (with its new hash), then
+rewrites ``laws.lock``. Because every lock update goes through a history entry, the
+integrity check can tell a recorded change from an unrecorded one:
+
+- files that differ from ``laws.lock``         -> changed outside lawkeep (unrecorded)
+- lock entries no history entry explains         -> ``laws.lock`` itself was rewritten by hand
+  (:func:`unexplained_lock_paths`)
+"""
+
+from __future__ import annotations
+
+import json
+import os
+import secrets
+import subprocess
+from collections.abc import Iterable
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Any, cast
+
+from lawkeep.errors import HistoryError
+from lawkeep.lock import LockDiff, LockFile, build_lock, compare, read_lock, write_lock
+from lawkeep.models import HistoryEntry, parse_iso, utc_now_iso
+from lawkeep.paths import history_path
+
+
+def new_entry_id() -> str:
+    return "h-" + secrets.token_hex(4)
+
+
+def _ensure_trailing_newline(path: Path) -> None:
+    if not path.is_file() or path.stat().st_size == 0:
+        return
+    with open(path, "rb+") as f:
+        f.seek(-1, os.SEEK_END)
+        if f.read(1) != b"\n":
+            f.write(b"\n")
+
+
+def append(root: str | os.PathLike[str], entry: HistoryEntry) -> HistoryEntry:
+    """Append one entry (fills ``id`` and ``timestamp`` if empty). Returns the entry."""
+    path = history_path(Path(root))
+    path.parent.mkdir(parents=True, exist_ok=True)
+    if not entry.id:
+        entry.id = new_entry_id()
+    if not entry.timestamp:
+        entry.timestamp = utc_now_iso()
+    line = json.dumps(entry.to_dict(), ensure_ascii=False, sort_keys=True) + "\n"
+    _ensure_trailing_newline(path)
+    fd = os.open(path, os.O_WRONLY | os.O_APPEND | os.O_CREAT, 0o644)
+    try:
+        os.write(fd, line.encode("utf-8"))
+        os.fsync(fd)
+    finally:
+        os.close(fd)
+    return entry
+
+
+def read(root: str | os.PathLike[str]) -> list[HistoryEntry]:
+    """All entries, oldest first. Raises HistoryError on a malformed line (with its number)."""
+    path = history_path(Path(root))
+    if not path.is_file():
+        return []
+    entries: list[HistoryEntry] = []
+    try:
+        text = path.read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError) as exc:
+        raise HistoryError(f"Cannot read {path}: {exc}") from None
+    for n, raw in enumerate(text.splitlines(), start=1):
+        if not raw.strip():
+            continue
+        try:
+            data = json.loads(raw)
+            if not isinstance(data, dict):
+                raise ValueError("not a JSON object")
+            entries.append(HistoryEntry.from_dict(cast("dict[str, Any]", data)))
+        except (ValueError, TypeError) as exc:
+            raise HistoryError(
+                f"laws/history.jsonl line {n} is not a valid history entry ({exc}).",
+                hint="The law history may have been edited by hand; restore it from git.",
+            ) from None
+    return entries
+
+
+def since(root: str | os.PathLike[str], timestamp: str | None) -> list[HistoryEntry]:
+    """Entries at or after ``timestamp`` (ISO 8601). ``None`` returns everything."""
+    entries = read(root)
+    if not timestamp:
+        return entries
+    start = parse_iso(timestamp)
+    return [e for e in entries if parse_iso(e.timestamp) >= start]
+
+
+def find(entries: Iterable[HistoryEntry], entry_id: str) -> HistoryEntry | None:
+    for e in entries:
+        if e.id == entry_id:
+            return e
+    return None
+
+
+def pending(entries: Iterable[HistoryEntry]) -> list[HistoryEntry]:
+    """``waiting`` entries that no later entry decides (via ``refers_to``)."""
+    entries = list(entries)
+    decided = {e.refers_to for e in entries if e.refers_to}
+    return [e for e in entries if e.status == "waiting" and e.id not in decided]
+
+
+def latest_hashes(entries: Iterable[HistoryEntry]) -> dict[str, str | None]:
+    """For every file any applied entry touched: its hash after the latest such entry."""
+    out: dict[str, str | None] = {}
+    for e in entries:
+        if e.status != "applied":
+            continue
+        out.update(e.files)
+    return out
+
+
+def unexplained_lock_paths(lock: LockFile | None, entries: Iterable[HistoryEntry]) -> list[str]:
+    """Paths whose fingerprint in ``laws.lock`` is not what the history says it should be.
+
+    A non-empty result means ``laws.lock`` was rewritten without going through
+    :func:`record_change` (for example a law edited and the lock regenerated by hand).
+    """
+    expected = latest_hashes(entries)
+    locked = dict(lock.files) if lock else {}
+    bad: list[str] = []
+    for path in sorted(set(expected) | set(locked)):
+        want = expected.get(path)
+        have = locked.get(path)
+        if want != have:
+            bad.append(path)
+    return bad
+
+
+def explains(entries: Iterable[HistoryEntry], path: str, sha: str | None) -> HistoryEntry | None:
+    """The latest applied entry that left ``path`` with fingerprint ``sha`` (None = deleted)."""
+    found = None
+    for e in entries:
+        if e.status == "applied" and path in e.files and e.files[path] == sha:
+            found = e
+    return found
+
+
+def default_person(root: str | os.PathLike[str] | None = None) -> str:
+    """``"person:<name>"`` from ``git config user.name``, else ``$USER``, else ``"person:unknown"``."""
+    name = ""
+    try:
+        out = subprocess.run(
+            ["git", "config", "user.name"],
+            cwd=str(root) if root else None,
+            capture_output=True,
+            text=True,
+            timeout=5,
+        )
+        name = out.stdout.strip()
+    except (OSError, subprocess.SubprocessError):
+        pass
+    name = name or os.environ.get("USER") or os.environ.get("USERNAME") or "unknown"
+    return f"person:{name}"
+
+
+@dataclass
+class RecordedChange:
+    entry: HistoryEntry
+    diff: LockDiff
+    lock: LockFile | None  # the new lock (None when status was not "applied")
+    notes: list[str] = field(default_factory=list[str])
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "entry": self.entry.to_dict(),
+            "diff": self.diff.to_dict(),
+            "lock_written": self.lock is not None,
+            "notes": self.notes,
+        }
+
+
+def record_change(
+    root: str | os.PathLike[str],
+    *,
+    action: str,
+    actor: str,
+    law_id: str | None = None,
+    direction: str | None = None,
+    reason: str = "",
+    permission_used: str = "none",
+    approved_by: str | None = None,
+    status: str = "applied",
+    sentence_before: str | None = None,
+    sentence_after: str | None = None,
+    details: dict[str, Any] | None = None,
+    refers_to: str | None = None,
+) -> RecordedChange:
+    """Record a law change that has ALREADY been made on disk, and refresh ``laws.lock``.
+
+    Call this right after writing/moving/deleting the law files. For ``status="applied"`` the
+    entry's ``files`` lists every fingerprinted file that differs from the current lock (new
+    hash, or ``None`` when deleted) and the lock is rewritten. For ``"waiting"`` /
+    ``"rejected"`` only the entry is appended (nothing changed on disk yet, the lock is kept).
+
+    If the lock already differed before this change (an earlier unrecorded edit), those files
+    are included too - the caller should only do this after a person accepted them; a note is
+    added to the result listing them so callers can show it.
+    """
+    root = Path(root)
+    old = read_lock(root)
+    if status == "applied":
+        # Refreshing laws.lock would also refresh the append-only marks, which would hide
+        # removed saved failing examples or history lines. Refuse instead, whatever the action.
+        from lawkeep.lock import check_append_only
+
+        shrunk = check_append_only(root, old)
+        if shrunk:
+            raise HistoryError(
+                " ".join(p.message for p in shrunk)
+                + " lawkeep will not record anything until the removed lines are restored "
+                "(for example with git)."
+            )
+    entry = HistoryEntry(
+        action=action,
+        actor=actor,
+        law_id=law_id,
+        direction=direction,
+        reason=reason,
+        permission_used=permission_used,
+        approved_by=approved_by,
+        status=status,
+        sentence_before=sentence_before,
+        sentence_after=sentence_after,
+        details=dict(details or {}),
+        refers_to=refers_to,
+        timestamp=utc_now_iso(),
+    )
+    if status != "applied":
+        append(root, entry)
+        return RecordedChange(entry=entry, diff=LockDiff(), lock=None)
+    current = build_lock(root)
+    diff = compare(old, current)
+    paths_changed = list(diff.paths())
+    if action == "accept_unrecorded_change":
+        # A person accepts what is on disk now. If laws.lock was rewritten by hand, the files
+        # may match the lock but not the history, so also record every file whose current
+        # fingerprint the history does not explain (history.unexplained_lock_paths).
+        expected = latest_hashes(read(root))
+        for p in sorted(set(expected) | set(current.files)):
+            if expected.get(p) != current.files.get(p) and p not in paths_changed:
+                paths_changed.append(p)
+    entry.files = {p: current.files.get(p) for p in paths_changed}
+    append(root, entry)
+    new_lock = build_lock(root)  # re-read so the history's append-only mark includes this entry
+    write_lock(root, new_lock)
+    notes: list[str] = []
+    if not diff.paths():
+        notes.append(
+            "No law files changed; the history entry was recorded and laws.lock refreshed."
+        )
+    return RecordedChange(entry=entry, diff=diff, lock=new_lock, notes=notes)
+
+
+# ---------------------------------------------------------------------------------------------
+# Session marker (local, uncommitted): used for the end-of-session law change report.
+
+
+def mark_session_start(root: str | os.PathLike[str], *, agent: str | None = None) -> str:
+    """Write ``.lawkeep/session.json`` with the current time; returns that timestamp."""
+    from lawkeep.paths import session_file
+
+    path = session_file(Path(root))
+    path.parent.mkdir(parents=True, exist_ok=True)
+    started = utc_now_iso()
+    path.write_text(json.dumps({"started_at": started, "agent": agent}) + "\n", encoding="utf-8")
+    return started
+
+
+def session_start(root: str | os.PathLike[str]) -> str | None:
+    """Timestamp written by :func:`mark_session_start`, or ``None`` (no session / unreadable)."""
+    from lawkeep.paths import session_file
+
+    path = session_file(Path(root))
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+        value = data.get("started_at")
+        if isinstance(value, str):
+            parse_iso(value)
+            return value
+    except (OSError, ValueError, AttributeError):
+        pass
+    return None

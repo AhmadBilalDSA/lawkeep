@@ -1,0 +1,35 @@
+# laws.lock - written by lawkeep; do not edit by hand.
+version = 1
+generated_at = "2026-11-22T10:20:39.937575Z"
+lawkeep_version = "0.1.0.dev0"
+
+[files]
+".github/workflows/lawkeep.yml" = "sha256:db555703edd4a3ab8fb1cd2497f7cde57a5a6dd9c0d62fc49f9032504da09c7c"
+"lawkeep.toml" = "sha256:3c1414b842b8092bb7f852200504b73bf8781b3c48a275c75ad95bcb30a5a2ec"
+"laws/exitcodes_empty_is_all_hold.py" = "sha256:52167f3c8eb64f6520278a7699f7392c9862f9c6c41134116a37a01a3786515f"
+"laws/exitcodes_order_independent.py" = "sha256:6940dc1cb194e80050cd19c739d43646e00fb9c6e5ff87dae4ae60d79e6174a5"
+"laws/exitcodes_precedence.py" = "sha256:30e00c280e71d6922727aeea03ac831ed3915d7cd3bf1dfe5e0415fc53d180c6"
+"laws/strategies.py" = "sha256:a79c16802a82c6d86cddcb8a5e4bc565d5823816fd1bcad27620fc663a3f89dc"
+
+[laws."exitcodes_empty_is_all_hold.combine_of_nothing_is_all_hold"]
+sentence = "Combining no result codes at all, or only 'all laws hold' codes, gives all laws hold (0)"
+file = "laws/exitcodes_empty_is_all_hold.py"
+hash = "sha256:70547a555b74d79f14bb517f5c4f872052712fdf76ad9af10eeccc3cc82a0bf8"
+
+[laws."exitcodes_order_independent.combine_ignores_order"]
+sentence = "The order in which result codes are combined never changes the combined result"
+file = "laws/exitcodes_order_independent.py"
+hash = "sha256:ef240ce4b5ecc066589fe3b92c4c5a871dd69e72c91f85cfa98fa6149e25178b"
+
+[laws."exitcodes_precedence.combine_picks_most_important_code"]
+sentence = "Combining result codes gives setup problem (3) if any code is 3, otherwise some laws fail (1) if any code is 1, otherwise waiting for a person (2) if any code is 2, otherwise all laws hold (0)"
+file = "laws/exitcodes_precedence.py"
+hash = "sha256:06b602641e30d19dece5e950699ae0656ff0bd66199e9f780a79db735625a6c7"
+
+[append_only."laws/failing_examples.jsonl"]
+lines = 0
+prefix_sha256 = "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+
+[append_only."laws/history.jsonl"]
+lines = 7
+prefix_sha256 = "sha256:8249d993588006b665500e529cf5a05b361d0ff8fd1f1937f7ce1195fd2dae98"

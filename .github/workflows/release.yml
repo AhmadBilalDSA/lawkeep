@@ -1,0 +1,98 @@
+# Release lawkeep to PyPI when a version tag (v0.1.0, v0.2.0, ...) is pushed.
+#
+# How it works:
+#   1. "build" checks out the tag, runs lint, type checks and the whole test suite, checks that
+#      the tag matches lawkeep.__version__, builds the wheel and sdist, and checks them.
+#   2. "publish" uploads them to PyPI with trusted publishing: PyPI trusts this workflow directly,
+#      so no token is stored anywhere. One-time setup on pypi.org (project lawkeep -> Publishing ->
+#      add a GitHub publisher): owner "lawkeep", repository "lawkeep", workflow "release.yml",
+#      environment "pypi".
+#   3. "github-release" creates a GitHub release for the tag with the built files attached.
+#
+# To release: bump __version__ in src/lawkeep/__init__.py, add a CHANGELOG.md entry, commit,
+# then `git tag v<version> && git push origin v<version>`.
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch: # re-run the build checks by hand (publishing still needs a tag)
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: build and check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: uv sync --locked --all-extras
+      - name: Lint and type check
+        run: |
+          uv run ruff check src tests
+          uv run ruff format --check src tests
+          uv run pyright
+      - name: Tests
+        run: uv run pytest -q
+      - name: Tag matches the package version
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          version=$(uv run python -c "import lawkeep; print(lawkeep.__version__)")
+          if [ "v$version" != "$GITHUB_REF_NAME" ]; then
+            echo "Tag $GITHUB_REF_NAME does not match lawkeep.__version__ ($version)." >&2
+            exit 1
+          fi
+      - name: Build
+        run: uv build
+      - name: Check the built files
+        run: |
+          uvx twine check --strict dist/*
+          unzip -l dist/*.whl | grep -q "lawkeep/py.typed"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          if-no-files-found: error
+
+  publish:
+    name: publish to PyPI
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/lawkeep/
+    permissions:
+      id-token: write # trusted publishing
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1
+
+  github-release:
+    name: GitHub release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" dist/* --title "lawkeep $GITHUB_REF_NAME" --notes "See CHANGELOG.md for what changed."

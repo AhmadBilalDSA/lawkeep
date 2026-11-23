@@ -1,0 +1,28 @@
+# lawkeep for your project: copy this file to .github/workflows/lawkeep.yml in YOUR repository.
+# (Files in this templates/ folder do not run in the lawkeep repository itself.)
+#
+# On every pull request it checks your laws and posts one comment: what holds, which laws
+# changed (and who said yes), and which changed code no law protects, so you only need to
+# review that part. It does not block merges unless you set fail-on-broken-laws to "true".
+name: lawkeep
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+  pull-requests: write # to post and update the one lawkeep comment
+
+jobs:
+  laws:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # the reports compare against the pull request's base commit
+      - uses: lawkeep/lawkeep@v0 # pin a release tag once lawkeep v0.1 is published
+        with:
+          # working-directory: "."       # the folder with lawkeep.toml
+          # python-version: "3.12"
+          # extra-packages: ""           # e.g. "lawkeep[deep]" for the experimental L3 backend
+          fail-on-broken-laws: "false" # "true" makes failing laws fail this job

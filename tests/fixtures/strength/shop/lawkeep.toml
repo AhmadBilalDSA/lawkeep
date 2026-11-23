@@ -1,0 +1,3 @@
+# Made-up example project for lawkeep's strength tests.
+[project]
+source = ["src"]
