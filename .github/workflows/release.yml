@@ -77,6 +77,8 @@ jobs:
           name: dist
           path: dist/
       - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          skip-existing: true # re-running a release (or v0.1.0, uploaded by hand) is safe
 
   github-release:
     name: GitHub release
