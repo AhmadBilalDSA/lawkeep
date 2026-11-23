@@ -68,8 +68,10 @@ jobs:
             work="$RUNNER_TEMP/$ex"
             cp -r "examples/$ex" "$work"
             (cd "$work" && git apply planted_bug.patch)
-            uv run lawkeep check --json --root "$work" > "$RUNNER_TEMP/$ex.json"
-            code=$?
+            # The planted bug must make the gate fail (exit 1). GitHub runs steps with `bash -e`,
+            # so capture the expected non-zero code instead of letting the shell stop here.
+            code=0
+            uv run lawkeep check --json --root "$work" > "$RUNNER_TEMP/$ex.json" || code=$?
             uv run python - "$RUNNER_TEMP/$ex.json" "$code" <<'PY'
           import json, sys
           report, code = json.load(open(sys.argv[1])), int(sys.argv[2])
